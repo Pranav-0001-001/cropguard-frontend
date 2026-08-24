@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CropGuard AI - CropMitra Chatbot</title>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Style sheet -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="phone-simulator">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="app-logo" onclick="window.location.href='dashboard.html'" style="cursor: pointer;">
+                <i class="fa-solid fa-house"></i>
+                <span id="txt-home-header">Home</span>
+            </div>
+            <div style="font-weight: bold; color: var(--primary-dark); display: flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-robot" style="color: var(--primary);"></i>
+                <span id="header-title">CropMitra Assistant</span>
+            </div>
+        </header>
+
+        <!-- Chat Container -->
+        <div class="screen-content" style="padding-bottom: 90px; justify-content: space-between; height: calc(100% - 72px);">
+            
+            <div class="chat-container">
+                <!-- Chat Messages Stream -->
+                <div class="chat-messages" id="chat-stream">
+                    <!-- Default greeting from Bot -->
+                    <div class="chat-bubble bot">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                            <span id="bot-greeting-msg">Ram Ram! I am CropMitra. Ask me anything about your crops, weather, or pest treatments.</span>
+                            <button onclick="readAloud(this)" style="background: none; border: none; cursor: pointer; color: var(--primary); font-size: 1.1rem; padding-left: 5px;" title="Listen">
+                                <i class="fa-solid fa-volume-high"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Suggested Query Pills -->
+                <div style="margin-top: 10px;">
+                    <p style="font-size: 0.75rem; font-weight: bold; color: var(--text-muted); margin-bottom: 4px;" id="lbl-suggestions">Tap to ask / पूछने के लिए टैप करें:</p>
+                    <div class="chat-pills-row">
+                        <div class="chat-pill" onclick="sendSuggestedQuestion(0)" id="pill-0">Yellow leaves?</div>
+                        <div class="chat-pill" onclick="sendSuggestedQuestion(1)" id="pill-1">Cure Tomato Blight?</div>
+                        <div class="chat-pill" onclick="sendSuggestedQuestion(2)" id="pill-2">When to harvest Rice?</div>
+                        <div class="chat-pill" onclick="sendSuggestedQuestion(3)" id="pill-3">Rain warning checklist?</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Chat Input Bar -->
+            <div class="chat-input-bar">
+                <input type="text" id="chat-user-input" placeholder="Type a message or tap pills above..." onkeypress="handleKeyPress(event)">
+                <button class="btn-chat-send" onclick="sendUserMessage()">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </div>
+
+        </div>
+
+        <!-- Persistent Bottom Navigation Bar -->
+        <nav class="bottom-nav">
+            <a href="dashboard.html" class="nav-item">
+                <i class="fa-solid fa-house"></i>
+                <span id="nav-home">Home</span>
+            </a>
+            <a href="lifespan.html" class="nav-item">
+                <i class="fa-solid fa-calendar-day"></i>
+                <span id="nav-timeline">Timeline</span>
+            </a>
+            <a href="scan.html" class="nav-item nav-item-fab">
+                <i class="fa-solid fa-camera"></i>
+            </a>
+            <a href="weather.html" class="nav-item">
+                <i class="fa-solid fa-cloud-sun"></i>
+                <span id="nav-weather">Weather</span>
+            </a>
+            <a href="assistant.html" class="nav-item active">
+                <i class="fa-solid fa-robot"></i>
+                <span id="nav-chatbot">Mitra</span>
+            </a>
+        </nav>
+    </div>
+
+    <script>
+        // Multi-language translation support
+        const dict = {
+            en: {
+                homeHeader: "Home",
+                headerTitle: "CropMitra AI",
+                greeting: "Namaste! I am CropMitra. Ask me anything about your crops, weather, or pest treatments.",
+                suggestions: "Quick Questions:",
+                pills: ["Yellow leaves?", "Cure Tomato Blight?", "When to harvest Rice?", "Rain warning checklist?"],
+                placeholder: "Type a message here...",
+                typingText: "CropMitra is typing...",
+                navHome: "Home",
+                navTimeline: "Timeline",
+                navWeather: "Weather",
+                navChatbot: "Mitra"
+            },
+            hi: {
+                homeHeader: "होम",
+                headerTitle: "क्रॉपमित्रा एआई",
+                greeting: "राम राम! मैं क्रॉपमित्रा हूँ। फसल स्वास्थ्य, कीट रोकथाम या मौसम से जुड़ी कोई भी जानकारी मुझसे पूछें।",
+                suggestions: "त्वरित प्रश्न:",
+                pills: ["पत्तियां पीली हैं?", "टमाटर झुलसा रोग इलाज?", "धान की कटाई कब करें?", "बारिश अलर्ट चेकलिस्ट?"],
+                placeholder: "यहाँ अपना प्रश्न लिखें...",
+                typingText: "क्रॉपमित्रा लिख रहा है...",
+                navHome: "मुख्य",
+                navTimeline: "समयरेखा",
+                navWeather: "मौसम",
+                navChatbot: "मित्रा"
+            },
+            mr: {
+                homeHeader: "होम",
+                headerTitle: "क्रॉपमित्रा एआई",
+                greeting: "राम राम! मी क्रॉपमित्रा आहे. पीक वाढ, रोग आणि फवारणी याविषयी कोणतीही माहिती मला विचारा.",
+                suggestions: "द्रुत प्रश्न:",
+                pills: ["पाने पिवळी पडलीत?", "टोमॅटो करपा नियंत्रण?", "भात कापणी कधी करावी?", "पावसाचा इशारा सल्ला?"],
+                placeholder: "येथे प्रश्न लिहा...",
+                typingText: "क्रॉपमित्रा उत्तर शोधत आहे...",
+                navHome: "मुख्य पान",
+                navTimeline: "पीक चक्र",
+                navWeather: "हवामान",
+                navChatbot: "मित्रा"
+            }
+        };
+
+        // Chatbot Knowledgebase Q&A
+        const qa_database = {
+            en: {
+                "yellow leaves?": "Yellow leaves usually mean Nitrogen deficiency. Apply 20kg Urea per acre or reduce water if the soil is too wet and muddy.",
+                "cure tomato blight?": "To cure Tomato Early Blight: Spray Copper Oxychloride (2.5g per Litre of water). Remove and burn infected bottom leaves immediately.",
+                "when to harvest rice?": "Harvest Rice when 85% of grain heads turn golden yellow. Stop water irrigation completely 10 days before harvesting.",
+                "rain warning checklist?": "If rain is expected: 1) Stop all fertilizer sprays, 2) Clean farm drainage ditches to prevent root rot waterlogging, 3) Secure dry grains in storage rooms.",
+                "default": "I understand your concern. Keep your soil watered twice a week and check under leaves for green bugs. You can also scan your leaf on our Scan screen!"
+            },
+            hi: {
+                "पत्तियां पीली हैं?": "पत्तियां पीली होना आमतौर पर नाइट्रोजन की कमी का संकेत है। प्रति एकड़ 20 किलो यूरिया का प्रयोग करें या यदि मिट्टी बहुत गीली है तो पानी देना कम करें।",
+                "टमाटर झुलसा रोग इलाज?": "टमाटर अगेती झुलसा का उपचार: कॉपर ऑक्सीक्लोराइड (2.5 ग्राम प्रति लीटर पानी) का छिड़काव करें। निचली संक्रमित पत्तियों को काटकर नष्ट करें।",
+                "धान की कटाई कब करें?": "जब धान की 85% बालियां सुनहरी पीली हो जाएं, तब कटाई करें। कटाई से 10 दिन पहले खेत का पानी पूरी तरह सुखा दें।",
+                "बारिश अलर्ट चेकलिस्ट?": "यदि वर्षा की संभावना है: 1) दवाओं का छिड़काव रोक दें, 2) जलभराव से बचने के लिए खेत की नालियां साफ करें, 3) कटी हुई फसल को सुरक्षित कमरे में ढक कर रखें।",
+                "default": "मैं समझ गया। कृपया सप्ताह में दो बार सिंचाई करें और पत्तों के नीचे छोटे कीड़ों की जांच करें। आप स्कैन स्क्रीन पर फोटो भी ले सकते हैं!"
+            },
+            mr: {
+                "पाने पिवळी पडलीत?": "पाने पिवळी पडणे हे सामान्यतः नायट्रोजनच्या कमतरतेचे लक्षण आहे. प्रति एकर २० किलो युरिया खत द्यावे किंवा शेतात जास्त चिखल असल्यास पाणी देणे थांबवावे.",
+                "टोमॅटो करपा नियंत्रण?": "टोमॅटो करपा रोगासाठी उपाय: कॉपर ऑक्झीक्लोराईड (२.५ ग्रॅम प्रति लीटर पाणी) ची फवारणी करावी आणि बाधित झालेली खालची पाने त्वरित कापून टाकावीत.",
+                "भात कापणी कधी करावी?": "भाताची लोंबी ८५% पिवळी किंवा सोनेरी झाल्यावर कापणी करावी. कापणीच्या १० दिवस आधी शेतातील पाणी पूर्णपणे काढून कोरडे करावे.",
+                "पावसाचा इशारा सल्ला?": "पाऊस पडणार असल्यास: १) औषध फवारणी थांबवा, २) पाण्याचा निचरा होण्यासाठी शेतातील गटार साफ करा, ३) काढलेले धान्य कोरड्या जागी सुरक्षित ठेवा.",
+                "default": "मी आपला प्रश्न समजलो. कृपया पिकाला आठवड्यातून दोनदा पाणी द्या आणि पानांच्या मागे बारीक किडींवर लक्ष ठेवा. स्कॅन स्क्रीनवर पानांचा फोटो काढून रोग ओळखू शकता!"
+            }
+        };
+
+        const currentLang = localStorage.getItem('cropguard_lang') || 'en';
+
+        function applyTranslation() {
+            const langDict = dict[currentLang];
+            document.getElementById('txt-home-header').textContent = langDict.homeHeader;
+            document.getElementById('header-title').textContent = langDict.headerTitle;
+            document.getElementById('bot-greeting-msg').textContent = langDict.greeting;
+            document.getElementById('lbl-suggestions').textContent = langDict.suggestions;
+            document.getElementById('chat-user-input').placeholder = langDict.placeholder;
+
+            // Setup pills
+            for (let i = 0; i < 4; i++) {
+                document.getElementById(`pill-${i}`).textContent = langDict.pills[i];
+            }
+
+            document.getElementById('nav-home').textContent = langDict.navHome;
+            document.getElementById('nav-timeline').textContent = langDict.navTimeline;
+            document.getElementById('nav-weather').textContent = langDict.navWeather;
+            document.getElementById('nav-chatbot').textContent = langDict.navChatbot;
+        }
+
+        // Send User message
+        function sendUserMessage() {
+            const inputEl = document.getElementById('chat-user-input');
+            const question = inputEl.value.trim();
+            if (!question) return;
+
+            appendBubble('user', question);
+            inputEl.value = '';
+
+            triggerBotResponse(question);
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendUserMessage();
+            }
+        }
+
+        function sendSuggestedQuestion(index) {
+            const question = dict[currentLang].pills[index];
+            appendBubble('user', question);
+            triggerBotResponse(question);
+        }
+
+        // Appends a chat bubble to the UI
+        function appendBubble(sender, text) {
+            const stream = document.getElementById('chat-stream');
+            const bubble = document.createElement('div');
+            bubble.className = `chat-bubble ${sender}`;
+
+            if (sender === 'bot') {
+                bubble.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                        <span>${text}</span>
+                        <button onclick="readAloud(this)" style="background: none; border: none; cursor: pointer; color: var(--primary); font-size: 1.1rem; padding-left: 5px; flex-shrink: 0;" title="Listen">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                    </div>
+                `;
+            } else {
+                bubble.textContent = text;
+            }
+
+            stream.appendChild(bubble);
+            
+            // Scroll to bottom
+            stream.scrollTop = stream.scrollHeight;
+        }
+
+        // Trigger bot response with simulated typing lag
+        function triggerBotResponse(userQuestion) {
+            const stream = document.getElementById('chat-stream');
+            
+            // Render typing indicator
+            const typingBubble = document.createElement('div');
+            typingBubble.className = "chat-bubble bot";
+            typingBubble.id = "typing-indicator";
+            typingBubble.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 0.8rem; font-style: italic; color: var(--text-muted);">${dict[currentLang].typingText}</span>
+                    <div class="typing-dots">
+                        <span></span><span></span><span></span>
+                    </div>
+                </div>
+            `;
+            stream.appendChild(typingBubble);
+            stream.scrollTop = stream.scrollHeight;
+
+            // Search in DB
+            const cleanQuery = userQuestion.toLowerCase().trim();
+            const db = qa_database[currentLang] || qa_database['en'];
+            
+            let reply = db["default"];
+            
+            // Simple match loop
+            for (const key in db) {
+                if (cleanQuery.includes(key.toLowerCase()) || key.toLowerCase().includes(cleanQuery)) {
+                    reply = db[key];
+                    break;
+                }
+            }
+
+            // Remove typing bubble and push response after 1000ms
+            setTimeout(() => {
+                const indicator = document.getElementById('typing-indicator');
+                if (indicator) indicator.remove();
+                
+                appendBubble('bot', reply);
+            }, 1000);
+        }
+
+        // TTS Speech Synthesis Voice playback
+        function readAloud(buttonElement) {
+            const textSpan = buttonElement.previousElementSibling;
+            if (!textSpan) return;
+            const textToSpeak = textSpan.innerText || textSpan.textContent;
+
+            // Stop any ongoing speech
+            window.speechSynthesis.cancel();
+
+            // Setup speech bubble visual feedback waveform
+            const wave = document.createElement('span');
+            wave.className = 'speech-animation';
+            wave.innerHTML = '<span></span><span></span><span></span>';
+            buttonElement.appendChild(wave);
+            buttonElement.querySelector('i').style.color = 'var(--accent)';
+
+            const utterance = new SpeechSynthesisUtterance(textToSpeak);
+            
+            // Try to assign matching local voice depending on language
+            const voices = window.speechSynthesis.getVoices();
+            if (currentLang === 'hi') {
+                const hiVoice = voices.find(v => v.lang.includes('hi') || v.lang.includes('IN'));
+                if (hiVoice) utterance.voice = hiVoice;
+                utterance.lang = 'hi-IN';
+            } else if (currentLang === 'mr') {
+                const mrVoice = voices.find(v => v.lang.includes('mr') || v.lang.includes('IN'));
+                if (mrVoice) utterance.voice = mrVoice;
+                utterance.lang = 'mr-IN';
+            } else {
+                const enVoice = voices.find(v => v.lang.includes('en'));
+                if (enVoice) utterance.voice = enVoice;
+                utterance.lang = 'en-US';
+            }
+
+            utterance.rate = 0.95; // slightly slower for rural accent readability
+
+            utterance.onend = function() {
+                // Remove visual speech wave icon
+                const animatedWave = buttonElement.querySelector('.speech-animation');
+                if (animatedWave) animatedWave.remove();
+                buttonElement.querySelector('i').style.color = 'var(--primary)';
+            };
+
+            utterance.onerror = function() {
+                const animatedWave = buttonElement.querySelector('.speech-animation');
+                if (animatedWave) animatedWave.remove();
+                buttonElement.querySelector('i').style.color = 'var(--primary)';
+            };
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // On load checking for auto question passed from results
+        window.addEventListener('DOMContentLoaded', () => {
+            applyTranslation();
+            
+            const passedQuestion = localStorage.getItem('cropguard_mitra_question');
+            if (passedQuestion) {
+                localStorage.removeItem('cropguard_mitra_question');
+                setTimeout(() => {
+                    appendBubble('user', passedQuestion);
+                    triggerBotResponse(passedQuestion);
+                }, 400);
+            }
+        });
+    </script>
+</body>
+</html>

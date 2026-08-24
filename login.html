@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CropGuard AI - Farmer Login</title>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Style sheet -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="phone-simulator">
+        <div class="screen-content no-nav" style="justify-content: space-between; padding-top: 50px; height: 100%;">
+            
+            <!-- Welcome Header -->
+            <div style="text-align: center;">
+                <div style="background-color: var(--primary-light); width: 64px; height: 64px; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 16px auto;">
+                    <i class="fa-solid fa-user-gear" style="font-size: 2rem; color: var(--primary-dark);"></i>
+                </div>
+                <h1 id="login-title" style="font-size: 1.8rem; margin-bottom: 8px;">Farmer Sign In</h1>
+                <p id="login-subtitle" style="font-size: 0.95rem;">Enter your mobile number to check your farm</p>
+            </div>
+
+            <!-- Login Form Card -->
+            <div class="card" style="margin: 20px 0; border: 1.5px solid rgba(46, 125, 50, 0.1);">
+                <!-- Name Field for customized greeting -->
+                <div class="form-group">
+                    <label id="lbl-name" for="farmer-name">Farmer Name / किसान का नाम</label>
+                    <input type="text" id="farmer-name" placeholder="e.g. Ramesh Kumar" value="Ramesh Kumar">
+                </div>
+
+                <!-- Phone number -->
+                <div class="form-group">
+                    <label id="lbl-phone" for="phone">Mobile Number / मोबाइल नंबर</label>
+                    <div style="position: relative; display: flex; align-items: center;">
+                        <span style="position: absolute; left: 16px; font-weight: bold; color: var(--text-muted); border-right: 1px solid rgba(0,0,0,0.1); padding-right: 8px;">+91</span>
+                        <input type="tel" id="phone" placeholder="98765 43210" maxlength="10" style="padding-left: 64px; width: 100%; font-weight: bold;" value="9876543210">
+                    </div>
+                </div>
+
+                <!-- 4 Digit Pin -->
+                <div class="form-group">
+                    <label id="lbl-pin" for="pin">4-Digit Security PIN / सुरक्षा पिन</label>
+                    <input type="password" id="pin" placeholder="••••" maxlength="4" style="text-align: center; font-size: 1.8rem; letter-spacing: 12px; font-weight: bold;" value="1234">
+                </div>
+
+                <div id="error-msg" style="color: var(--color-danger); font-size: 0.85rem; font-weight: bold; text-align: center; display: none;"></div>
+            </div>
+
+            <!-- Action buttons -->
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <button id="btn-login" class="btn btn-primary" onclick="validateAndLogin()">
+                    Sign In <i class="fa-solid fa-sign-in-alt"></i>
+                </button>
+                <a href="index.html" id="btn-back" class="btn btn-outline" style="text-decoration: none;">
+                    <i class="fa-solid fa-arrow-left"></i> Change Language
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Translations
+        const dict = {
+            en: {
+                title: "Farmer Sign In",
+                subtitle: "Enter details to monitor your farm health",
+                name: "Farmer Name (Optional)",
+                phone: "Mobile Number",
+                pin: "4-Digit Security PIN",
+                login: "Sign In",
+                back: "Change Language",
+                errPhone: "Please enter a valid 10-digit mobile number",
+                errPin: "Please enter a 4-digit security PIN",
+                defaultName: "Farmer Friend"
+            },
+            hi: {
+                title: "किसान लॉगिन",
+                subtitle: "अपने खेत की सुरक्षा देखने के लिए लॉगिन करें",
+                name: "किसान का नाम (वैकल्पिक)",
+                phone: "मोबाइल नंबर",
+                pin: "4-अंकों का सुरक्षा पिन",
+                login: "प्रवेश करें",
+                back: "भाषा बदलें",
+                errPhone: "कृपया 10 अंकों का वैध मोबाइल नंबर दर्ज करें",
+                errPin: "कृपया 4 अंकों का सुरक्षा पिन दर्ज करें",
+                defaultName: "किसान भाई"
+            },
+            mr: {
+                title: "शेतकरी लॉगिन",
+                subtitle: "आपल्या शेताची सुरक्षा पाहण्यासाठी लॉगिन करा",
+                name: "शेतकऱ्याचे नाव (पर्यायी)",
+                phone: "मोबाईल नंबर",
+                pin: "4-अंकी सुरक्षा पिन",
+                login: "प्रवेश करा",
+                back: "भाषा बदला",
+                errPhone: "कृपया 10 अंकी वैध मोबाईल नंबर प्रविष्ट करा",
+                errPin: "कृपया 4 अंकी सुरक्षा पिन प्रविष्ट करा",
+                defaultName: "शेतकरी मित्र"
+            }
+        };
+
+        const currentLang = localStorage.getItem('cropguard_lang') || 'en';
+
+        function applyTranslation() {
+            const langDict = dict[currentLang];
+            document.getElementById('login-title').textContent = langDict.title;
+            document.getElementById('login-subtitle').textContent = langDict.subtitle;
+            document.getElementById('lbl-name').textContent = langDict.name;
+            document.getElementById('lbl-phone').textContent = langDict.phone;
+            document.getElementById('lbl-pin').textContent = langDict.pin;
+            document.getElementById('btn-login').innerHTML = `${langDict.login} <i class="fa-solid fa-sign-in-alt"></i>`;
+            document.getElementById('btn-back').innerHTML = `<i class="fa-solid fa-arrow-left"></i> ${langDict.back}`;
+        }
+
+        function validateAndLogin() {
+            const nameInput = document.getElementById('farmer-name').value.trim();
+            const phoneInput = document.getElementById('phone').value.trim();
+            const pinInput = document.getElementById('pin').value.trim();
+            const errorMsg = document.getElementById('error-msg');
+            
+            const langDict = dict[currentLang];
+
+            errorMsg.style.display = 'none';
+
+            if (phoneInput.length !== 10 || isNaN(phoneInput)) {
+                errorMsg.textContent = langDict.errPhone;
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            if (pinInput.length !== 4 || isNaN(pinInput)) {
+                errorMsg.textContent = langDict.errPin;
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            // Save details to LocalStorage
+            const finalName = nameInput || langDict.defaultName;
+            localStorage.setItem('cropguard_farmer_name', finalName);
+            localStorage.setItem('cropguard_farmer_phone', phoneInput);
+            localStorage.setItem('cropguard_is_logged', 'true');
+
+            // Redirect to dashboard
+            window.location.href = 'dashboard.html';
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            applyTranslation();
+        });
+    </script>
+</body>
+</html>

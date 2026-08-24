@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CropGuard AI - Welcome</title>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- PWA Manifest & App Config -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2E7D32">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="CropGuard AI">
+    
+    <!-- Custom Style sheet -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="phone-simulator">
+        <div class="screen-content no-nav" style="justify-content: center; align-items: center; text-align: center; height: 100%;">
+            
+            <!-- Welcome Logo / Branding -->
+            <div style="margin-bottom: 20px; animation: bounce-bar 3s infinite alternate;">
+                <div style="background-color: var(--primary); width: 90px; height: 90px; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 16px auto; box-shadow: 0 10px 25px rgba(46, 125, 50, 0.3);">
+                    <i class="fa-solid fa-shield-halved" style="font-size: 3rem; color: var(--accent);"></i>
+                </div>
+                <h1 style="font-size: 2.2rem; margin-bottom: 6px; letter-spacing: -0.5px;">
+                    CropGuard <span style="color: var(--accent);">AI</span>
+                </h1>
+                <p id="tagline" style="font-size: 1.05rem; font-weight: 500;">AI Guard for Healthy Crops</p>
+            </div>
+
+            <!-- Language Section Card -->
+            <div class="card" style="width: 100%; border: 1.5px solid rgba(46, 125, 50, 0.1);">
+                <p id="select-lang-text" style="font-weight: 700; color: var(--primary-dark); font-size: 1.05rem;">Select Your Language / भाषा चुनें</p>
+                
+                <div class="language-selector">
+                    <button class="lang-btn active" onclick="changeLanguage('en')" id="btn-en">
+                        <span>English</span>
+                        <i class="fa-regular fa-circle-check"></i>
+                    </button>
+                    <button class="lang-btn" onclick="changeLanguage('hi')" id="btn-hi">
+                        <span>हिंदी (Hindi)</span>
+                        <i class="fa-regular fa-circle"></i>
+                    </button>
+                    <button class="lang-btn" onclick="changeLanguage('mr')" id="btn-mr">
+                        <span>मराठी (Marathi)</span>
+                        <i class="fa-regular fa-circle"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Get Started Button -->
+            <button id="get-started-btn" class="btn btn-primary" onclick="proceed()" style="width: 100%; margin-top: 15px;">
+                Get Started <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+        </div>
+    </div>
+
+    <script>
+        // Language dictionaries
+        const dict = {
+            en: {
+                tagline: "AI Guard for Healthy Crops",
+                selectLang: "Select Your Language / भाषा चुनें",
+                getStarted: "Get Started"
+            },
+            hi: {
+                tagline: "स्वस्थ फसलों के लिए एआई रक्षक",
+                selectLang: "अपनी भाषा चुनें / Select Your Language",
+                getStarted: "शुरू करें"
+            },
+            mr: {
+                tagline: "निरोगी पिकांसाठी एआय रक्षक",
+                selectLang: "आपली भाषा निवडा / Select Your Language",
+                getStarted: "सुरू करा"
+            }
+        };
+
+        // Set initial language from storage or default to English
+        let currentLang = localStorage.getItem('cropguard_lang') || 'en';
+
+        function changeLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('cropguard_lang', lang);
+            
+            // Update active styling
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.lang-btn i').forEach(icon => {
+                icon.className = 'fa-regular fa-circle';
+            });
+            
+            const activeBtn = document.getElementById(`btn-${lang}`);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+                activeBtn.querySelector('i').className = 'fa-regular fa-circle-check';
+            }
+
+            // Update text elements
+            document.getElementById('tagline').textContent = dict[lang].tagline;
+            document.getElementById('select-lang-text').textContent = dict[lang].selectLang;
+            document.getElementById('get-started-btn').innerHTML = `${dict[lang].getStarted} <i class="fa-solid fa-arrow-right"></i>`;
+        }
+
+        function proceed() {
+            window.location.href = 'login.html';
+        }
+
+        // Run translation on load
+        window.addEventListener('DOMContentLoaded', () => {
+            changeLanguage(currentLang);
+        });
+
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(reg => console.log('Service Worker Registered!', reg))
+                    .catch(err => console.log('Service Worker Registration Failed:', err));
+            });
+        }
+    </script>
+</body>
+</html>

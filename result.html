@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CropGuard AI - Diagnosis Result</title>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Style sheet -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="phone-simulator">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="app-logo" onclick="window.location.href='scan.html'" style="cursor: pointer;">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span id="txt-back-header">Scan Again</span>
+            </div>
+            <div style="font-weight: bold; color: var(--primary-dark);" id="header-title">Diagnosis</div>
+        </header>
+
+        <!-- Screen Scroll Area -->
+        <div class="screen-content">
+            
+            <!-- Result Overview Card -->
+            <div class="card" style="padding: 15px; overflow: hidden; align-items: center; text-align: center; border: 1.5px solid rgba(46,125,50,0.1);">
+                <!-- Uploaded Thumbnail Display -->
+                <div id="result-photo-container" style="width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--primary); background-size: cover; background-position: center; margin-bottom: 12px; display: flex; justify-content: center; align-items: center; background-color: var(--primary-light);">
+                    <i class="fa-solid fa-image" style="font-size: 2.2rem; color: var(--primary-dark);" id="fallback-photo-icon"></i>
+                </div>
+
+                <h2 id="diagnosed-crop-name" style="font-size: 1.4rem; color: var(--primary-dark); font-weight: 800;">Rice</h2>
+                <div id="crop-sub-details" style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; margin-top: -4px;">Species: Oryza sativa | Variety: Basmati</div>
+                
+                <!-- Severity Status Badge -->
+                <div style="margin: 10px 0;">
+                    <span id="severity-badge" class="badge badge-warning" style="font-size: 1rem; padding: 6px 16px;">Moderate Threat</span>
+                </div>
+
+                <h3 id="disease-name" style="color: var(--color-danger); font-size: 1.15rem; font-weight: 800;">Rice Leaf Blast (धान झोंका रोग)</h3>
+            </div>
+
+            <!-- Title: Treatment Steps -->
+            <div>
+                <h2 id="treatment-title" style="margin-bottom: 4px;">Recommended Care / उपचार के चरण</h2>
+                <p id="treatment-desc" style="font-size: 0.85rem;">Follow these visual steps immediately to save your crop.</p>
+            </div>
+
+            <!-- Dynamic Steps Container -->
+            <div id="treatment-steps-container" style="display: flex; flex-direction: column; gap: 16px;">
+                <!-- Filled dynamically by JavaScript -->
+            </div>
+
+            <!-- Expert Disclaimer Warning -->
+            <div class="card" style="background-color: #ECEFF1; border-left: 5px solid #607D8B; gap: 6px; padding: 16px;">
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <i class="fa-solid fa-circle-info" style="color: #455A64; font-size: 1.3rem;"></i>
+                    <h4 id="disclaimer-title" style="font-weight: 700; color: #455A64; font-size: 0.9rem;">Expert Recommendation Note</h4>
+                </div>
+                <p id="disclaimer-text" style="font-size: 0.78rem; color: #546E7A; line-height: 1.4;">
+                    Our AI model provides advice based on visual patterns. Please consult local block crop officers or seed specialists before large-scale spray implementation.
+                </p>
+            </div>
+
+            <!-- Actions buttons -->
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
+                <button class="btn btn-primary" onclick="goToMitra()" id="btn-chat-mitra">
+                    <i class="fa-solid fa-comments"></i> Ask CropMitra About This
+                </button>
+                <button class="btn btn-outline" onclick="window.location.href='scan.html'" id="btn-rescan">
+                    <i class="fa-solid fa-rotate-left"></i> Scan Another Crop
+                </button>
+            </div>
+
+        </div>
+
+        <!-- Persistent Bottom Navigation Bar -->
+        <nav class="bottom-nav">
+            <a href="dashboard.html" class="nav-item">
+                <i class="fa-solid fa-house"></i>
+                <span id="nav-home">Home</span>
+            </a>
+            <a href="lifespan.html" class="nav-item">
+                <i class="fa-solid fa-calendar-day"></i>
+                <span id="nav-timeline">Timeline</span>
+            </a>
+            <a href="scan.html" class="nav-item nav-item-fab">
+                <i class="fa-solid fa-camera"></i>
+            </a>
+            <a href="weather.html" class="nav-item">
+                <i class="fa-solid fa-cloud-sun"></i>
+                <span id="nav-weather">Weather</span>
+            </a>
+            <a href="assistant.html" class="nav-item">
+                <i class="fa-solid fa-robot"></i>
+                <span id="nav-chatbot">Mitra</span>
+            </a>
+        </nav>
+    </div>
+
+    <script>
+        // Multi-language translation support
+        const dict = {
+            en: {
+                backHeader: "Scan Again",
+                headerTitle: "Diagnosis Result",
+                badgeHealthy: "Healthy",
+                badgeModerate: "Moderate Threat",
+                badgeSevere: "Severe Alert",
+                treatmentTitle: "Recommended Care",
+                treatmentDesc: "Follow these visual steps immediately to save your crop",
+                disclaimerTitle: "Expert Verification Note",
+                disclaimerText: "Our AI model provides advice based on visual patterns. Please consult your local block crop officer before applying chemical sprays.",
+                btnChatMitra: "Ask CropMitra About This",
+                btnRescan: "Scan Another Crop",
+                navHome: "Home",
+                navTimeline: "Timeline",
+                navWeather: "Weather",
+                navChatbot: "Mitra"
+            },
+            hi: {
+                backHeader: "पुनः स्कैन",
+                headerTitle: "जांच का परिणाम",
+                badgeHealthy: "स्वस्थ फसल",
+                badgeModerate: "मध्यम खतरा",
+                badgeSevere: "गंभीर चेतावनी",
+                treatmentTitle: "अनुशंसित उपचार",
+                treatmentDesc: "फसल को बचाने के लिए इन चरणों का तुरंत पालन करें",
+                disclaimerTitle: "विशेषज्ञ सत्यापन नोट",
+                disclaimerText: "हमारा एआई मॉडल दृश्य पैटर्न के आधार पर सलाह देता है। कृपया रासायनिक छिड़काव से पहले अपने स्थानीय कृषि अधिकारी से सलाह लें।",
+                btnChatMitra: "क्रॉपमित्रा से पूछें",
+                btnRescan: "दूसरी फसल स्कैन करें",
+                navHome: "मुख्य",
+                navTimeline: "समयरेखा",
+                navWeather: "मौसम",
+                navChatbot: "मित्रा"
+            },
+            mr: {
+                backHeader: "पुन्हा स्कॅन",
+                headerTitle: "तपासणीचा निकाल",
+                badgeHealthy: "निरोगी पीक",
+                badgeModerate: "मध्यम धोका",
+                badgeSevere: "गंभीर धोका",
+                treatmentTitle: "शिफारस केलेले उपाय",
+                treatmentDesc: "पीक वाचवण्यासाठी या स्टेप्सचे त्वरित पालन करा",
+                disclaimerTitle: "तज्ज्ञ सल्ला टीप",
+                disclaimerText: "आमुचे एआय मॉडेल केवळ फोटोच्या आधारे सल्ला देते. रासायनिक फवारणीपूर्वी स्थानिक कृषी सहाय्यक अधिकाऱ्याचा सल्ला घ्यावा.",
+                btnChatMitra: "क्रॉपमित्राची मदत घ्या",
+                btnRescan: "दुसऱ्या पिकाचा स्कॅन",
+                navHome: "मुख्य पान",
+                navTimeline: "पीक चक्र",
+                navWeather: "हवामान",
+                navChatbot: "मित्रा"
+            }
+        };
+
+        const currentLang = localStorage.getItem('cropguard_lang') || 'en';
+
+        // Specific Treatment steps database
+        const treatments = {
+            tomato: [
+                { step: 1, icon: "fa-prescription-bottle-medical", color: "#E53935", title_en: "Spray Fungicide", text_en: "Apply Copper Oxychloride 50WP (2.5g per Litre of water).", title_hi: "कवकनाशी का छिड़काव", text_hi: "कॉपर ऑक्सीक्लोराइड 50WP (2.5 ग्राम प्रति लीटर पानी) का छिड़काव करें।", title_mr: "बुरशीनाशक फवारणी", text_mr: "कॉपर ऑक्सीक्लोराईड ५०डब्ल्यूपी (२.५ ग्रॅम प्रति लीटर पाणी) ची फवारणी करावी." },
+                { step: 2, icon: "fa-scissors", color: "#FB8C00", title_en: "Prune Infected Leaves", text_en: "Cut off and burn the yellow/brown spotted bottom leaves.", title_hi: "संक्रमित पत्तियां काटें", text_hi: "पीले/भूरे धब्बों वाली निचली पत्तियों को काटकर तुरंत जला दें।", title_mr: "बाधित पाने छाटणे", text_mr: "खालची पिवळी/तपकिरी डागाळलेली पाने कापून नष्ट करावी." },
+                { step: 3, icon: "fa-faucet-drip", color: "#1E88E5", title_en: "Adjust Irrigation", text_en: "Irrigate early in the morning and avoid wetting the plant leaves directly.", title_hi: "सिंचाई में बदलाव करें", text_hi: "सुबह जल्दी सिंचाई करें और पत्तियों पर सीधे पानी डालने से बचें।", title_mr: "पाणी देणे नियंत्रित करा", text_mr: "सकाळी लवकर पाणी द्या आणि पानांवर थेट पाणी पडू देऊ नका." }
+            ],
+            rice: [
+                { step: 1, icon: "fa-prescription-bottle-medical", color: "#E53935", title_en: "Apply Tricyclazole", text_en: "Spray Tricyclazole 75WP (0.6g per Litre of water) immediately.", title_hi: "ट्राइसाइक्लाजोल का उपयोग", text_hi: "ट्राइसाइक्लाजोल 75WP (0.6 ग्राम प्रति लीटर पानी) का तुरंत छिड़काव करें।", title_mr: "ट्रायसायक्लॅझोल फवारणी", text_mr: "ट्रायसायक्लॅझोल ७५डब्ल्यूपी (०.६ ग्रॅम प्रति लीटर पाणी) ची त्वरित फवारणी करावी." },
+                { step: 2, icon: "fa-hand-holding-droplet", color: "#FB8C00", title_en: "Suspend Nitrogen fertilizer", text_en: "Stop adding Nitrogen/Urea immediately. High nitrogen feeds the blast fungus.", title_hi: "यूरिया का प्रयोग रोकें", text_hi: "यूरिया/नाइट्रोजन का प्रयोग तुरंत बंद करें। अधिक नाइट्रोजन कवक को बढ़ाता है।", title_mr: "युरियाचा वापर थांबवणे", text_mr: "युरिया/नायट्रोजन खताचा डोस त्वरित बंद करा. अति नायट्रोजनमुळे बुरशी वाढते." },
+                { step: 3, icon: "fa-water", color: "#1E88E5", title_en: "Keep Field Flooded", text_en: "Maintain a thin layer of standing water (2-3cm) to suppress disease spore release.", title_hi: "खेत में नमी रखें", text_hi: "रोग के बीजाणुओं को फैलने से रोकने के लिए खेत में हल्की नमी (2-3 सेमी पानी) रखें।", title_mr: "शेतात पाणी साठवणे", text_mr: "रोगाचे बीजाणू पसरू नयेत म्हणून शेतात हलके पाणी साठवून ठेवावे." }
+            ],
+            potato: [
+                { step: 1, icon: "fa-prescription-bottle-medical", color: "#E53935", title_en: "Spray Metalaxyl", text_en: "Apply Metalaxyl-M + Mancozeb (2.5g per Litre) to arrest spreading.", title_hi: "मेटालैक्सिल का छिड़काव", text_hi: "रोग के फैलाव को रोकने के लिए मेटालैक्सिल-एम + मैनकोजेब (2.5 ग्राम प्रति लीटर) का छिड़काव करें।", title_mr: "मेटालॅक्सिल फवारणी", text_mr: "रोगाचा प्रादुर्भाव रोखण्यासाठी मेटालॅक्सिल-एम + मँकोझेब (२.५ ग्रॅम प्रति लीटर) ची फवारणी करावी." },
+                { step: 2, icon: "fa-triangle-exclamation", color: "#FB8C00", title_en: "Isolate Sick Rows", text_en: "Uproot highly damaged potato plants and destroy them immediately outside the farm.", title_hi: "संक्रमित पौधों को हटाएं", text_hi: "गंभीर रूप से क्षतिग्रस्त पौधों को उखाड़कर खेत से बाहर ले जाकर नष्ट करें।", title_mr: "बाधित झाडे उपटणे", text_mr: "जास्त बाधित झालेली बटाट्याची झाडे उपटून शेताबाहेर नष्ट करावी." },
+                { step: 3, icon: "fa-calendar-check", color: "#1E88E5", title_en: "Advance Harvest Date", text_en: "If crop is near maturity, cut foliage (dehaulming) to protect underground tubers.", title_hi: "शीघ्र खुदाई करें", text_hi: "यदि फसल परिपक्वता के पास है, तो भूमिगत आलू को बचाने के लिए ऊपर की पत्तियों को काट दें।", title_mr: "लवकर कापणी", text_mr: "पीक काढणीला आले असल्यास बटाटे वाचवण्यासाठी वरील पाने (डीहॉल्मिंग) कापून घ्यावीत." }
+            ],
+            generic: [
+                { step: 1, icon: "fa-prescription-bottle-medical", color: "#E53935", title_en: "Organic Neem Oil Spray", text_en: "Spray Neem Oil mix (5ml per Litre water with emulsifier) to check pathogen spreading.", title_hi: "नीम तेल का छिड़काव", text_hi: "नीम के तेल के घोल (5 मिली प्रति लीटर पानी) का छिड़काव करें ताकि कवक फैले नहीं।", title_mr: "कडुलिंबाच्या तेलाची फवारणी", text_mr: "कडुलिंबाच्या तेलाची (५ मिली प्रति लीटर पाणी) फवारणी करावी जेणेकरून रोग पसरणार नाही." },
+                { step: 2, icon: "fa-trash-can", color: "#FB8C00", title_en: "Remove Leaf Debris", text_en: "Collect and clear fallen leaves from the soil to avoid disease buildup.", title_hi: "सूखी पत्तियां हटाएं", text_hi: "रोग को दोबारा पनपने से रोकने के लिए गिरी हुई संक्रमित पत्तियों को हटा दें।", title_mr: "कचरा गोळा करणे", text_mr: "झाडांखालील पडलेली पाने गोळा करून नष्ट करा, ज्यामुळे रोग पुन्हा उद्भवणार नाही." },
+                { step: 3, icon: "fa-shield-heart", color: "#1E88E5", title_en: "Apply Trichoderma Viride", text_en: "Apply bio-control agent Trichoderma to soil near roots for bio-protection.", title_hi: "ट्राइकोडर्मा का प्रयोग", text_hi: "जैविक सुरक्षा के लिए जड़ों के पास ट्राइकोडर्मा विरिडी जैव-नियंत्रक का प्रयोग करें।", title_mr: "ट्रायकोडर्मा वापरणे", text_mr: "मुळांच्या जवळ ट्रायकोडर्मा विरिडी या जैविक घटकाचा वापर करावा." }
+            ]
+        };
+
+        function parseQueryParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const crop = urlParams.get('crop') || 'Rice';
+            const species = urlParams.get('species') || '';
+            const variety = urlParams.get('variety') || '';
+            const disease = urlParams.get('disease') || 'Healthy';
+            const severity = urlParams.get('severity') || 'Green';
+
+            // 1. Title details
+            document.getElementById('diagnosed-crop-name').textContent = crop;
+            
+            // Sub details line
+            let subText = '';
+            if (species) subText += `Species: ${species} `;
+            if (variety) {
+                if (subText) subText += '| ';
+                subText += `Variety: ${variety}`;
+            }
+            if (!subText) subText = 'Custom Crop Entry';
+            document.getElementById('crop-sub-details').textContent = subText;
+
+            // 2. Severity setup
+            const badge = document.getElementById('severity-badge');
+            const diseaseEl = document.getElementById('disease-name');
+            const langDict = dict[currentLang];
+
+            if (severity === 'Green' || disease.toLowerCase().includes('healthy') || disease.toLowerCase().includes('स्वस्थ')) {
+                badge.className = 'badge badge-success';
+                badge.textContent = langDict.badgeHealthy;
+                diseaseEl.textContent = currentLang === 'en' ? 'Healthy Crop! No Disease Detected.' : (currentLang === 'hi' ? 'स्वस्थ फसल! कोई रोग नहीं मिला।' : 'निरोगी पीक! कोणताही रोग आढळला नाही.');
+                diseaseEl.style.color = 'var(--color-success)';
+                renderTreatmentSteps('healthy', crop);
+            } else if (severity === 'Yellow') {
+                badge.className = 'badge badge-warning';
+                badge.textContent = langDict.badgeModerate;
+                diseaseEl.textContent = disease;
+                diseaseEl.style.color = 'var(--color-warning)';
+                renderStepsByCrop(crop);
+            } else {
+                badge.className = 'badge badge-danger';
+                badge.textContent = langDict.badgeSevere;
+                diseaseEl.textContent = disease;
+                diseaseEl.style.color = 'var(--color-danger)';
+                renderStepsByCrop(crop);
+            }
+
+            // 3. Image preview handling
+            const container = document.getElementById('result-photo-container');
+            const fallbackIcon = document.getElementById('fallback-photo-icon');
+            const storedImage = localStorage.getItem('cropguard_temp_image');
+
+            if (storedImage && storedImage !== 'MOCK') {
+                container.style.backgroundImage = `url(${storedImage})`;
+                fallbackIcon.style.display = 'none';
+            } else {
+                // Set default mockup photos depending on crop
+                let mockImgUrl = '';
+                const cropLower = crop.toLowerCase();
+                if (cropLower.includes('tomato')) {
+                    mockImgUrl = "https://images.unsplash.com/photo-1592417817098-8f3d6eb19675?auto=format&fit=crop&q=80&w=300"; // spotted leaves
+                } else if (cropLower.includes('rice') || cropLower.includes('paddy')) {
+                    mockImgUrl = "https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?auto=format&fit=crop&q=80&w=300"; // paddy leaf blast
+                } else if (cropLower.includes('potato')) {
+                    mockImgUrl = "https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&q=80&w=300"; // potato foliage
+                } else {
+                    mockImgUrl = "https://images.unsplash.com/photo-1505244301547-0e620573e34a?auto=format&fit=crop&q=80&w=300"; // green leaves
+                }
+                container.style.backgroundImage = `url(${mockImgUrl})`;
+                fallbackIcon.style.display = 'none';
+            }
+        }
+
+        function renderStepsByCrop(crop) {
+            const cropLower = crop.toLowerCase();
+            let key = 'generic';
+            if (cropLower.includes('tomato')) {
+                key = 'tomato';
+            } else if (cropLower.includes('rice') || cropLower.includes('paddy') || cropLower.includes('धान') || cropLower.includes('भात')) {
+                key = 'rice';
+            } else if (cropLower.includes('potato') || cropLower.includes('आलू') || cropLower.includes('बटाटा')) {
+                key = 'potato';
+            }
+            renderTreatmentSteps(key);
+        }
+
+        function renderTreatmentSteps(treatmentKey, cropName = '') {
+            const container = document.getElementById('treatment-steps-container');
+            container.innerHTML = '';
+
+            if (treatmentKey === 'healthy') {
+                const langDict = dict[currentLang];
+                container.innerHTML = `
+                    <div class="card" style="border-left: 5px solid var(--color-success); background-color: var(--primary-light);">
+                        <div style="display: flex; gap: 16px; align-items: center;">
+                            <div style="font-size: 2.2rem; color: var(--color-success);"><i class="fa-solid fa-face-smile"></i></div>
+                            <div>
+                                <h3 style="color: var(--primary-dark); font-weight:700;">
+                                    ${currentLang === 'en' ? 'Excellent Crop Health' : (currentLang === 'hi' ? 'बेहतरीन फसल स्वास्थ्य' : 'उत्कृष्ट पीक आरोग्य')}
+                                </h3>
+                                <p style="font-size:0.85rem; color: var(--primary-dark); margin-top:4px;">
+                                    ${currentLang === 'en' ? `Your ${cropName} crop shows no active visual signs of disease. Keep up the standard irrigation and monitoring schedule!` : 
+                                     (currentLang === 'hi' ? `आपकी ${cropName} फसल में रोग का कोई लक्षण नहीं है। सिंचाई और निगरानी जारी रखें!` : 
+                                      `तुमच्या ${cropName} पिकामध्ये कोणत्याही रोगाची लक्षणे नाहीत. पाणी देणे व लक्ष ठेवणे सुरू ठेवावे!`)}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            const stepList = treatments[treatmentKey];
+            stepList.forEach(item => {
+                let stepTitle = item[`title_${currentLang}`];
+                let stepText = item[`text_${currentLang}`];
+
+                const cardHtml = `
+                    <div class="card" style="border-left: 5px solid ${item.color};">
+                        <div style="display: flex; gap: 16px; align-items: flex-start;">
+                            <!-- Big round numbering index badge -->
+                            <div style="width: 40px; height: 40px; border-radius: 50%; background-color: ${item.color}20; color: ${item.color}; display: flex; justify-content: center; align-items: center; font-weight: 800; font-size: 1.1rem; flex-shrink: 0;">
+                                ${item.step}
+                            </div>
+                            <div style="flex: 1;">
+                                <h3 style="color: var(--primary-dark); font-weight: 700; display:flex; align-items:center; gap:8px;">
+                                    <i class="fa-solid ${item.icon}" style="color: ${item.color};"></i> ${stepTitle}
+                                </h3>
+                                <p style="font-size: 0.88rem; margin-top: 4px; color: var(--text-main); font-weight: 500;">
+                                    ${stepText}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHtml;
+            });
+        }
+
+        function applyTranslation() {
+            const langDict = dict[currentLang];
+            document.getElementById('txt-back-header').textContent = langDict.backHeader;
+            document.getElementById('header-title').textContent = langDict.headerTitle;
+            document.getElementById('treatment-title').textContent = langDict.treatmentTitle;
+            document.getElementById('treatment-desc').textContent = langDict.treatmentDesc;
+            document.getElementById('disclaimer-title').textContent = langDict.disclaimerTitle;
+            document.getElementById('disclaimer-text').textContent = langDict.disclaimerText;
+            document.getElementById('btn-chat-mitra').innerHTML = `<i class="fa-solid fa-comments"></i> ${langDict.btnChatMitra}`;
+            document.getElementById('btn-rescan').innerHTML = `<i class="fa-solid fa-rotate-left"></i> ${langDict.btnRescan}`;
+
+            document.getElementById('nav-home').textContent = langDict.navHome;
+            document.getElementById('nav-timeline').textContent = langDict.navTimeline;
+            document.getElementById('nav-weather').textContent = langDict.navWeather;
+            document.getElementById('nav-chatbot').textContent = langDict.navChatbot;
+        }
+
+        function goToMitra() {
+            // Save context for CropMitra chatbot page
+            const cropName = document.getElementById('diagnosed-crop-name').textContent;
+            const disease = document.getElementById('disease-name').textContent;
+            localStorage.setItem('cropguard_mitra_question', `My ${cropName} crop was diagnosed with ${disease}. What should I do?`);
+            window.location.href = 'assistant.html';
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            applyTranslation();
+            parseQueryParams();
+        });
+    </script>
+</body>
+</html>

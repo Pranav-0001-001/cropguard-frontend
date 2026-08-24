@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CropGuard AI - Weather Alerts</title>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Style sheet -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="phone-simulator">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="app-logo" onclick="window.location.href='dashboard.html'" style="cursor: pointer;">
+                <i class="fa-solid fa-house"></i>
+                <span id="txt-home-header">Home</span>
+            </div>
+            <div style="font-weight: bold; color: var(--primary-dark);" id="header-title">Weather Alerts</div>
+        </header>
+
+        <!-- Screen Scroll Area -->
+        <div class="screen-content">
+            
+            <!-- Current Weather Dashboard Card -->
+            <div class="card primary-accent" style="padding: 24px 20px; position: relative;">
+                <div class="card-title-row">
+                    <h3 id="weather-location" style="font-size: 1.2rem; font-weight: bold; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-location-dot" style="color: var(--accent);"></i> Rampur Block, UP
+                    </h3>
+                    <span class="badge badge-success" id="weather-today-label" style="background-color: var(--accent); color: var(--text-main);">TODAY</span>
+                </div>
+
+                <div class="weather-main">
+                    <div class="temp-large">
+                        31<span>°C</span>
+                    </div>
+                    <i class="fa-solid fa-cloud-showers-water weather-icon-big"></i>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 12px; margin-top: 5px;">
+                    <div>
+                        <p style="font-size: 0.75rem; color: rgba(255,255,255,0.8);" id="lbl-humidity">Humidity</p>
+                        <h4 style="color: white; font-weight: bold; font-size: 1.05rem;">88%</h4>
+                    </div>
+                    <div>
+                        <p style="font-size: 0.75rem; color: rgba(255,255,255,0.8);" id="lbl-wind">Wind Speed</p>
+                        <h4 style="color: white; font-weight: bold; font-size: 1.05rem;">12 km/h</h4>
+                    </div>
+                    <div>
+                        <p style="font-size: 0.75rem; color: rgba(255,255,255,0.8);" id="lbl-rain">Rain Risk</p>
+                        <h4 style="color: white; font-weight: bold; font-size: 1.05rem;">70%</h4>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Humidity Risk Warning Box -->
+            <div class="card danger-accent" style="animation: pulse-danger 3s infinite;">
+                <div style="display: flex; gap: 12px; align-items: flex-start;">
+                    <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.8rem; color: var(--color-danger); margin-top: 4px;"></i>
+                    <div style="flex: 1;">
+                        <h3 id="danger-card-title" style="color: var(--color-danger); font-weight: 800;">High Humidity Alert!</h3>
+                        <p id="danger-card-desc" style="font-size: 0.85rem; color: #212121; font-weight: 500; margin-top: 4px; line-height: 1.45;">
+                            High humidity (88%) and cloudy skies detected. Risk of Fungal Leaf Diseases (like Tomato Early Blight & Rice Leaf Blast) is VERY HIGH. Spray preventative fungicide if crop is at vegetative stage.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Title: 3-Day Forecast -->
+            <div>
+                <h2 id="forecast-header" style="margin-bottom: 4px;">3-Day Farming Forecast</h2>
+                <p id="forecast-subheader" style="font-size: 0.85rem;">Plan your field activities according to the sky.</p>
+            </div>
+
+            <!-- Forecast Rows -->
+            <div style="display: flex; flex-direction: column; gap: 12px;" id="forecast-container">
+                <!-- Row 1 -->
+                <div class="card" style="padding: 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display: flex; gap: 12px; align-items: center;">
+                            <div style="font-size: 1.8rem; color: var(--accent);"><i class="fa-solid fa-sun"></i></div>
+                            <div>
+                                <h4 id="day1-name" style="font-weight: 700; color: var(--primary-dark);">Tomorrow (Wednesday)</h4>
+                                <p style="font-size: 0.82rem;" id="day1-adv">Clear skies - Ideal time to harvest or apply sprays.</p>
+                            </div>
+                        </div>
+                        <div style="text-align: right; font-weight: bold; color: var(--primary-dark);">33°C</div>
+                    </div>
+                </div>
+
+                <!-- Row 2 -->
+                <div class="card" style="padding: 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display: flex; gap: 12px; align-items: center;">
+                            <div style="font-size: 1.8rem; color: #78909C;"><i class="fa-solid fa-cloud-showers-heavy"></i></div>
+                            <div>
+                                <h4 id="day2-name" style="font-weight: 700; color: var(--primary-dark);">Thursday</h4>
+                                <p style="font-size: 0.82rem;" id="day2-adv">Heavy rainfall warning. Do not apply fertilizer sprays today.</p>
+                            </div>
+                        </div>
+                        <div style="text-align: right; font-weight: bold; color: var(--primary-dark);">28°C</div>
+                    </div>
+                </div>
+
+                <!-- Row 3 -->
+                <div class="card" style="padding: 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display: flex; gap: 12px; align-items: center;">
+                            <div style="font-size: 1.8rem; color: #B0BEC5;"><i class="fa-solid fa-cloud-sun"></i></div>
+                            <div>
+                                <h4 id="day3-name" style="font-weight: 700; color: var(--primary-dark);">Friday</h4>
+                                <p style="font-size: 0.82rem;" id="day3-adv">Partly cloudy. Suitable for standard watering.</p>
+                            </div>
+                        </div>
+                        <div style="text-align: right; font-weight: bold; color: var(--primary-dark);">30°C</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Persistent Bottom Navigation Bar -->
+        <nav class="bottom-nav">
+            <a href="dashboard.html" class="nav-item">
+                <i class="fa-solid fa-house"></i>
+                <span id="nav-home">Home</span>
+            </a>
+            <a href="lifespan.html" class="nav-item">
+                <i class="fa-solid fa-calendar-day"></i>
+                <span id="nav-timeline">Timeline</span>
+            </a>
+            <a href="scan.html" class="nav-item nav-item-fab">
+                <i class="fa-solid fa-camera"></i>
+            </a>
+            <a href="weather.html" class="nav-item active">
+                <i class="fa-solid fa-cloud-sun"></i>
+                <span id="nav-weather">Weather</span>
+            </a>
+            <a href="assistant.html" class="nav-item">
+                <i class="fa-solid fa-robot"></i>
+                <span id="nav-chatbot">Mitra</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Pulsing danger keyframe stylesheet inject -->
+    <style>
+        @keyframes pulse-danger {
+            0% { border-left-color: var(--color-danger); box-shadow: var(--card-shadow); }
+            50% { border-left-color: #FF1744; box-shadow: 0 0 15px rgba(211, 47, 47, 0.25); }
+            100% { border-left-color: var(--color-danger); box-shadow: var(--card-shadow); }
+        }
+    </style>
+
+    <script>
+        // Multi-language translation support
+        const dict = {
+            en: {
+                homeHeader: "Home",
+                headerTitle: "Weather Alerts",
+                humidity: "Humidity",
+                wind: "Wind Speed",
+                rain: "Rain Risk",
+                dangerTitle: "High Humidity Alert!",
+                dangerDesc: "High humidity (88%) and cloudy skies detected. Risk of Fungal Leaf Diseases (like Tomato Early Blight & Rice Leaf Blast) is VERY HIGH. Spray preventative fungicide if crop is at vegetative stage.",
+                forecastTitle: "3-Day Farming Forecast",
+                forecastSub: "Plan your field activities according to the sky",
+                day1: "Tomorrow (Wednesday)",
+                day1adv: "Clear skies - Ideal time to harvest or apply sprays.",
+                day2: "Thursday",
+                day2adv: "Heavy rainfall warning. Do not apply fertilizer sprays today.",
+                day3: "Friday",
+                day3adv: "Partly cloudy. Suitable for standard watering.",
+                navHome: "Home",
+                navTimeline: "Timeline",
+                navWeather: "Weather",
+                navChatbot: "Mitra"
+            },
+            hi: {
+                homeHeader: "होम",
+                headerTitle: "मौसम अलर्ट",
+                humidity: "आर्द्रता",
+                wind: "हवा की गति",
+                rain: "वर्षा की संभावना",
+                dangerTitle: "उच्च आर्द्रता चेतावनी!",
+                dangerDesc: "उच्च आर्द्रता (88%) और बादलों से घिरे आसमान का पता चला है। कवक पत्ती रोगों (जैसे टमाटर अगेती झुलसा और धान झोंका रोग) का जोखिम बहुत अधिक है। यदि फसल वानस्पतिक अवस्था में है तो सुरक्षात्मक कवकनाशी का छिड़काव करें।",
+                forecastTitle: "3-दिवसीय कृषि पूर्वानुमान",
+                forecastSub: "आसमान की स्थिति के अनुसार अपने खेत के काम की योजना बनाएं",
+                day1: "कल (बुधवार)",
+                day1adv: "साफ आसमान - कटाई या दवा छिड़काव के लिए सबसे अच्छा समय।",
+                day2: "गुरुवार",
+                day2adv: "भारी बारिश की चेतावनी। आज रासायनिक खाद का छिड़काव न करें।",
+                day3: "शुक्रवार",
+                day3adv: "आंशिक रूप से बादल। सामान्य सिंचाई के लिए उपयुक्त दिन।",
+                navHome: "मुख्य",
+                navTimeline: "समयरेखा",
+                navWeather: "मौसम",
+                navChatbot: "मित्रा"
+            },
+            mr: {
+                homeHeader: "होम",
+                headerTitle: "हवामान अलर्ट",
+                humidity: "आर्द्रता",
+                wind: "वाऱ्याचा वेग",
+                rain: "पावसाची शक्यता",
+                dangerTitle: "अति आर्द्रता इशारा!",
+                dangerDesc: "हवेतील अति आर्द्रता (८८%) आणि ढगाळ हवामान यामुळे बुरशीजन्य रोगांचा (उदा. टोमॅटो करपा आणि भात करपा रोग) प्रादुर्भाव होण्याची शक्यता खूप जास्त आहे. पीक वाढीच्या अवस्थेत असल्यास प्रतिबंधक बुरशीनाशकाची फवारणी करावी.",
+                forecastTitle: "३-दिवसीय हवामान अंदाज",
+                forecastSub: "हवामान पाहून शेतातील कामांचे नियोजन करा",
+                day1: "उद्या (बुधवार)",
+                day1adv: "स्वच्छ आकाश - कापणी किंवा औषध फवारणीसाठी उत्तम वेळ आहे.",
+                day2: "गुरुवार",
+                day2adv: "मुसळधार पावसाचा इशारा. आज खते किंवा औषधे फवारू नका.",
+                day3: "शुक्रवार",
+                day3adv: "ढगाळ हवामान. पिकाला पाणी देण्यासाठी योग्य दिवस.",
+                navHome: "मुख्य पान",
+                navTimeline: "पीक चक्र",
+                navWeather: "हवामान",
+                navChatbot: "मित्रा"
+            }
+        };
+
+        const currentLang = localStorage.getItem('cropguard_lang') || 'en';
+
+        function applyTranslation() {
+            const langDict = dict[currentLang];
+            document.getElementById('txt-home-header').textContent = langDict.homeHeader;
+            document.getElementById('header-title').textContent = langDict.headerTitle;
+            document.getElementById('lbl-humidity').textContent = langDict.humidity;
+            document.getElementById('lbl-wind').textContent = langDict.wind;
+            document.getElementById('lbl-rain').textContent = langDict.rain;
+            
+            document.getElementById('danger-card-title').textContent = langDict.dangerTitle;
+            document.getElementById('danger-card-desc').textContent = langDict.dangerDesc;
+
+            document.getElementById('forecast-header').textContent = langDict.forecastTitle;
+            document.getElementById('forecast-subheader').textContent = langDict.forecastSub;
+
+            document.getElementById('day1-name').textContent = langDict.day1;
+            document.getElementById('day1-adv').textContent = langDict.day1adv;
+            document.getElementById('day2-name').textContent = langDict.day2;
+            document.getElementById('day2-adv').textContent = langDict.day2adv;
+            document.getElementById('day3-name').textContent = langDict.day3;
+            document.getElementById('day3-adv').textContent = langDict.day3adv;
+
+            document.getElementById('nav-home').textContent = langDict.navHome;
+            document.getElementById('nav-timeline').textContent = langDict.navTimeline;
+            document.getElementById('nav-weather').textContent = langDict.navWeather;
+            document.getElementById('nav-chatbot').textContent = langDict.navChatbot;
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            applyTranslation();
+        });
+    </script>
+</body>
+</html>

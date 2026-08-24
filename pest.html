@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CropGuard AI - Report Pest</title>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Style sheet -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="phone-simulator">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="app-logo" onclick="window.location.href='dashboard.html'" style="cursor: pointer;">
+                <i class="fa-solid fa-house"></i>
+                <span id="txt-home-header">Home</span>
+            </div>
+            <div style="font-weight: bold; color: var(--primary-dark);" id="header-title">Report Pest</div>
+        </header>
+
+        <!-- Screen Scroll Area -->
+        <div class="screen-content">
+            
+            <!-- Step 1: Pest Cards Selection -->
+            <div>
+                <h2 id="step1-title" style="margin-bottom: 4px;">1. Select Insect / कीट चुनें</h2>
+                <p id="step1-desc" style="font-size: 0.85rem;">Which pest did you spot in your crop field?</p>
+            </div>
+
+            <!-- Pest Selector Grid -->
+            <div class="grid-2">
+                <div class="visual-option selected" onclick="selectPest('Fall Armyworm', this)">
+                    <span class="icon">🐛</span>
+                    <span id="pest-armyworm">Fall Armyworm</span>
+                </div>
+                <div class="visual-option" onclick="selectPest('Aphids', this)">
+                    <span class="icon">🪰</span>
+                    <span id="pest-aphids">Aphids (चेपा)</span>
+                </div>
+                <div class="visual-option" onclick="selectPest('Whiteflies', this)">
+                    <span class="icon">🦋</span>
+                    <span id="pest-whiteflies">Whiteflies (सफेद मक्खी)</span>
+                </div>
+                <div class="visual-option" onclick="selectPest('Stem Borer', this)">
+                    <span class="icon">🦟</span>
+                    <span id="pest-borer">Stem Borer</span>
+                </div>
+            </div>
+
+            <!-- Step 2: Plus/Minus Counter -->
+            <div style="margin-top: 10px;">
+                <h2 id="step2-title" style="margin-bottom: 4px;">2. How many did you see? / मात्रा चुनें</h2>
+                <p id="step2-desc" style="font-size: 0.85rem;">Choose estimate quantity spotted per square meter.</p>
+            </div>
+
+            <!-- Count Selector Widget -->
+            <div class="card" style="align-items: center; padding: 20px; border: 1.5px solid rgba(46, 125, 50, 0.1);">
+                <div class="pest-count-box">
+                    <button class="btn-counter" onclick="adjustCount(-1)" style="font-size: 1.8rem;">−</button>
+                    <span class="count-display" id="pest-count-value">5</span>
+                    <button class="btn-counter" onclick="adjustCount(1)" style="font-size: 1.8rem;">+</button>
+                </div>
+                <p id="counter-level-status" style="font-weight: 700; color: var(--color-warning); font-size: 0.9rem;">Medium Infestation (मध्यम प्रकोप)</p>
+            </div>
+
+            <!-- Success message container (Hidden initially) -->
+            <div id="success-banner" class="card primary-accent" style="display: none; animation: slide-down-animation 0.4s ease-out;">
+                <div style="display: flex; gap: 12px; align-items: flex-start;">
+                    <i class="fa-solid fa-circle-check" style="font-size: 1.8rem; color: var(--accent);"></i>
+                    <div>
+                        <h3 id="success-title" style="font-weight: 800;">Report Sent Successfully!</h3>
+                        <p id="success-desc" style="font-size: 0.85rem; margin-top: 4px; line-height: 1.4;">
+                            Logged reference: <strong>#CG-49021</strong>. Details and coordinates transmitted to your local Block Agriculture Development Office. An advisor will contact you within 24 hours.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Send Report Button -->
+            <button class="btn btn-primary" id="btn-submit-report" onclick="submitPestReport()" style="width: 100%; margin-top: 10px;">
+                <i class="fa-solid fa-paper-plane"></i> Send to Agriculture Office
+            </button>
+
+        </div>
+
+        <!-- Persistent Bottom Navigation Bar -->
+        <nav class="bottom-nav">
+            <a href="dashboard.html" class="nav-item">
+                <i class="fa-solid fa-house"></i>
+                <span id="nav-home">Home</span>
+            </a>
+            <a href="lifespan.html" class="nav-item">
+                <i class="fa-solid fa-calendar-day"></i>
+                <span id="nav-timeline">Timeline</span>
+            </a>
+            <a href="scan.html" class="nav-item nav-item-fab">
+                <i class="fa-solid fa-camera"></i>
+            </a>
+            <a href="weather.html" class="nav-item">
+                <i class="fa-solid fa-cloud-sun"></i>
+                <span id="nav-weather">Weather</span>
+            </a>
+            <a href="assistant.html" class="nav-item">
+                <i class="fa-solid fa-robot"></i>
+                <span id="nav-chatbot">Mitra</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Success slide down animation style sheet inject -->
+    <style>
+        @keyframes slide-down-animation {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+
+    <script>
+        // Multi-language translation support
+        const dict = {
+            en: {
+                homeHeader: "Home",
+                headerTitle: "Report Pest",
+                step1Title: "1. Select Insect",
+                step1Desc: "Which pest did you spot in your crop field?",
+                pestArmyworm: "Fall Armyworm",
+                pestAphids: "Aphids (चेपा)",
+                pestWhiteflies: "Whiteflies",
+                pestBorer: "Stem Borer",
+                step2Title: "2. How many did you see?",
+                step2Desc: "Choose estimate quantity spotted per square meter",
+                levelLow: "Low Risk Level",
+                levelMedium: "Medium Infestation Alert",
+                levelHigh: "Danger: Severe Infestation!",
+                successTitle: "Report Sent Successfully!",
+                successDesc: "Logged reference: #CG-49021. Details and coordinates transmitted to your local Block Agriculture Development Office. An advisor will contact you within 24 hours.",
+                btnSubmitReport: "Send to Agriculture Office",
+                navHome: "Home",
+                navTimeline: "Timeline",
+                navWeather: "Weather",
+                navChatbot: "Mitra"
+            },
+            hi: {
+                homeHeader: "होम",
+                headerTitle: "कीट रिपोर्ट करें",
+                step1Title: "1. कीट / कीड़ा चुनें",
+                step1Desc: "आपने अपने खेत में कौन सा कीट देखा?",
+                pestArmyworm: "आर्मीवर्म सुंडी",
+                pestAphids: "चेपा (एफिड्स)",
+                pestWhiteflies: "सफेद मक्खी",
+                pestBorer: "तना छेदक सुंडी",
+                step2Title: "2. मात्रा का चयन करें",
+                step2Desc: "प्रति वर्ग मीटर में दिखाई देने वाली अनुमानित मात्रा",
+                levelLow: "कम जोखिम स्तर",
+                levelMedium: "मध्यम प्रकोप की चेतावनी",
+                levelHigh: "खतरा: गंभीर कीट प्रकोप!",
+                successTitle: "रिपोर्ट सफलतापूर्वक भेजी गई!",
+                successDesc: "दर्ज टिकट संख्या: #CG-49021. विवरण स्थानीय ब्लॉक कृषि विकास कार्यालय को भेज दिया गया है। 24 घंटे में संपर्क किया जाएगा।",
+                btnSubmitReport: "कृषि कार्यालय को भेजें",
+                navHome: "मुख्य",
+                navTimeline: "समयरेखा",
+                navWeather: "मौसम",
+                navChatbot: "मित्रा"
+            },
+            mr: {
+                homeHeader: "होम",
+                headerTitle: "कीटक नोंदवा",
+                step1Title: "१. कीटक निवडा",
+                step1Desc: "आपल्या पिकात कोणता कीटक आढळला आहे?",
+                pestArmyworm: "लष्करी अळी",
+                pestAphids: "मावा (चेपा)",
+                pestWhiteflies: "पांढरी माशी",
+                pestBorer: "खोडकिडा",
+                step2Title: "२. संख्या निवडा",
+                step2Desc: "प्रति चौरस मीटरमध्ये अंदाजे आढळलेले कीटक निवडा",
+                levelLow: "कमी धोक्याची पातळी",
+                levelMedium: "मध्यम प्रादुर्भावाचा इशारा",
+                levelHigh: "धोका: तीव्र कीटक प्रादुर्भाव!",
+                successTitle: "माहिती यशस्वीरित्या पाठवली!",
+                successDesc: "नोंदणी क्रमांक: #CG-49021. माहिती आणि शेताचे नकाशे स्थानिक तालुका कृषी विकास कार्यालयात पाठवण्यात आले आहेत. २४ तासांत संपर्क केला जाईल.",
+                btnSubmitReport: "कृषी कार्यालयात पाठवा",
+                navHome: "मुख्य पान",
+                navTimeline: "पीक चक्र",
+                navWeather: "हवामान",
+                navChatbot: "मित्रा"
+            }
+        };
+
+        const currentLang = localStorage.getItem('cropguard_lang') || 'en';
+        let selectedPestName = 'Fall Armyworm';
+        let currentPestCount = 5;
+
+        function applyTranslation() {
+            const langDict = dict[currentLang];
+            document.getElementById('txt-home-header').textContent = langDict.homeHeader;
+            document.getElementById('header-title').textContent = langDict.headerTitle;
+            document.getElementById('step1-title').textContent = langDict.step1Title;
+            document.getElementById('step1-desc').textContent = langDict.step1Desc;
+            
+            document.getElementById('pest-armyworm').textContent = langDict.pestArmyworm;
+            document.getElementById('pest-aphids').textContent = langDict.pestAphids;
+            document.getElementById('pest-whiteflies').textContent = langDict.pestWhiteflies;
+            document.getElementById('pest-borer').textContent = langDict.pestBorer;
+
+            document.getElementById('step2-title').textContent = langDict.step2Title;
+            document.getElementById('step2-desc').textContent = langDict.step2Desc;
+            
+            document.getElementById('success-title').textContent = langDict.successTitle;
+            document.getElementById('success-desc').textContent = langDict.successDesc;
+            document.getElementById('btn-submit-report').innerHTML = `<i class="fa-solid fa-paper-plane"></i> ${langDict.btnSubmitReport}`;
+
+            document.getElementById('nav-home').textContent = langDict.navHome;
+            document.getElementById('nav-timeline').textContent = langDict.navTimeline;
+            document.getElementById('nav-weather').textContent = langDict.navWeather;
+            document.getElementById('nav-chatbot').textContent = langDict.navChatbot;
+            
+            updateLevelDisplay();
+        }
+
+        function selectPest(pest, element) {
+            selectedPestName = pest;
+            
+            document.querySelectorAll('.visual-option').forEach(card => {
+                card.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            
+            // Hide success banner if selecting a new pest to report
+            document.getElementById('success-banner').style.display = 'none';
+        }
+
+        function adjustCount(change) {
+            currentPestCount += change;
+            if (currentPestCount < 0) currentPestCount = 0;
+            
+            document.getElementById('pest-count-value').textContent = currentPestCount;
+            updateLevelDisplay();
+        }
+
+        function updateLevelDisplay() {
+            const levelEl = document.getElementById('counter-level-status');
+            const langDict = dict[currentLang];
+
+            if (currentPestCount <= 3) {
+                levelEl.textContent = langDict.levelLow;
+                levelEl.style.color = 'var(--color-success)';
+            } else if (currentPestCount <= 8) {
+                levelEl.textContent = langDict.levelMedium;
+                levelEl.style.color = 'var(--color-warning)';
+            } else {
+                levelEl.textContent = langDict.levelHigh;
+                levelEl.style.color = 'var(--color-danger)';
+            }
+        }
+
+        function submitPestReport() {
+            // Save data to localStorage
+            const report = {
+                pest: selectedPestName,
+                count: currentPestCount,
+                timestamp: new Date().toISOString()
+            };
+            
+            const reports = JSON.parse(localStorage.getItem('cropguard_pest_reports')) || [];
+            reports.push(report);
+            localStorage.setItem('cropguard_pest_reports', JSON.stringify(reports));
+
+            // Display success banner
+            const banner = document.getElementById('success-banner');
+            banner.style.display = 'block';
+            
+            // Disable button briefly to prevent duplicate reports
+            const btn = document.getElementById('btn-submit-report');
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+            }, 3000);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            applyTranslation();
+        });
+    </script>
+</body>
+</html>

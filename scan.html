@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CropGuard AI - Scan Crop</title>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Style sheet -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="phone-simulator">
+        <!-- Scanner Scan Overlay (Hidden by default) -->
+        <div id="scan-overlay" class="scan-overlay">
+            <div class="scanner-radar">
+                <i class="fa-solid fa-qrcode" style="font-size: 3rem; color: var(--accent);"></i>
+            </div>
+            <div style="text-align: center; display: flex; flex-direction: column; gap: 8px;">
+                <h3 id="overlay-title" style="color: var(--accent); font-weight: bold; font-size: 1.2rem;">AI Scanning in progress...</h3>
+                <p id="overlay-desc" style="color: white; font-size: 0.9rem; max-width: 250px;">Analyzing leaf tissue & matching pest databases...</p>
+                <div class="spinner" style="margin: 10px auto 0 auto;"></div>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <header class="app-header">
+            <div class="app-logo" onclick="window.location.href='dashboard.html'" style="cursor: pointer;">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span id="txt-scan-header">Back to Home</span>
+            </div>
+            <div style="font-weight: bold; color: var(--primary-dark);" id="header-title">Scan Crop</div>
+        </header>
+
+        <!-- Screen Scroll Area -->
+        <div class="screen-content">
+            
+            <!-- Step 1: Crop Select -->
+            <div>
+                <h2 id="step1-title" style="margin-bottom: 6px;">1. Select Crop / फसल चुनें</h2>
+                <p id="step1-desc">Tap your crop or enter custom variety below.</p>
+            </div>
+
+            <!-- Standard Crop Grid -->
+            <div class="grid-2" id="predefined-crops-grid">
+                <div class="visual-option selected" onclick="selectCrop('Rice', this)">
+                    <span class="icon">🌾</span>
+                    <span id="crop-rice">Rice (धान)</span>
+                </div>
+                <div class="visual-option" onclick="selectCrop('Wheat', this)">
+                    <span class="icon">🌾</span>
+                    <span id="crop-wheat">Wheat (गेहूं)</span>
+                </div>
+                <div class="visual-option" onclick="selectCrop('Tomato', this)">
+                    <span class="icon">🍅</span>
+                    <span id="crop-tomato">Tomato (टमाटर)</span>
+                </div>
+                <div class="visual-option" onclick="selectCrop('Potato', this)">
+                    <span class="icon">🥔</span>
+                    <span id="crop-potato">Potato (आलू)</span>
+                </div>
+            </div>
+
+            <!-- Manual Custom Crop Entry Block -->
+            <div class="card" style="border: 1px solid rgba(46, 125, 50, 0.15); background-color: var(--bg-white);">
+                <div style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" onclick="toggleManualForm()">
+                    <span style="font-weight: 700; color: var(--primary-dark); display: flex; align-items: center; gap: 8px; font-size: 0.95rem;">
+                        <i class="fa-solid fa-pen-to-square"></i> <span id="manual-toggle-text">Or Type Crop & Variety Manually</span>
+                    </span>
+                    <i id="manual-chevron" class="fa-solid fa-chevron-down" style="color: var(--primary); transition: var(--transition);"></i>
+                </div>
+
+                <!-- Form Fields (Collapsible) -->
+                <div id="manual-form" style="display: none; flex-direction: column; gap: 12px; margin-top: 15px; border-top: 1px solid rgba(0,0,0,0.06); padding-top: 15px;">
+                    <div class="form-group">
+                        <label id="lbl-manual-name" for="manual-crop-name">Crop Name * (e.g. Rice, Chilli)</label>
+                        <input type="text" id="manual-crop-name" placeholder="e.g. Rice">
+                    </div>
+                    <div class="form-group">
+                        <label id="lbl-manual-species" for="manual-crop-species">Species (e.g. Oryza sativa)</label>
+                        <input type="text" id="manual-crop-species" placeholder="e.g. Oryza sativa">
+                    </div>
+                    <div class="form-group">
+                        <label id="lbl-manual-variety" for="manual-crop-variety">Variety / Type (e.g. Basmati, IR64)</label>
+                        <input type="text" id="manual-crop-variety" placeholder="e.g. Basmati 370">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Upload Photo -->
+            <div>
+                <h2 id="step2-title" style="margin-bottom: 6px;">2. Upload Photo / फोटो अपलोड</h2>
+                <p id="step2-desc">Upload leaf image or click to simulate photo capture.</p>
+            </div>
+
+            <!-- Camera Upload Container -->
+            <div class="camera-box" onclick="triggerFileInput()" id="camera-box">
+                <i class="fa-solid fa-camera-retro" id="camera-placeholder-icon"></i>
+                <p id="camera-placeholder-text">Take Photo or Select File</p>
+                <img id="upload-preview" class="image-preview" src="" alt="Crop Preview">
+                <input type="file" id="file-input" accept="image/*" onchange="previewImage(event)">
+            </div>
+
+            <!-- Action Trigger Button -->
+            <button class="btn btn-primary" id="btn-analyze" onclick="startScan()" style="width: 100%; margin-top: 10px;">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Analyze Now / अभी जांचें
+            </button>
+
+        </div>
+
+        <!-- Persistent Bottom Navigation Bar -->
+        <nav class="bottom-nav">
+            <a href="dashboard.html" class="nav-item">
+                <i class="fa-solid fa-house"></i>
+                <span id="nav-home">Home</span>
+            </a>
+            <a href="lifespan.html" class="nav-item">
+                <i class="fa-solid fa-calendar-day"></i>
+                <span id="nav-timeline">Timeline</span>
+            </a>
+            <a href="scan.html" class="nav-item nav-item-fab active">
+                <i class="fa-solid fa-camera"></i>
+            </a>
+            <a href="weather.html" class="nav-item">
+                <i class="fa-solid fa-cloud-sun"></i>
+                <span id="nav-weather">Weather</span>
+            </a>
+            <a href="assistant.html" class="nav-item">
+                <i class="fa-solid fa-robot"></i>
+                <span id="nav-chatbot">Mitra</span>
+            </a>
+        </nav>
+    </div>
+
+    <script>
+        // Multi-language translation support
+        const dict = {
+            en: {
+                backHeader: "Back to Home",
+                headerTitle: "Scan Crop",
+                step1Title: "1. Select Crop",
+                step1Desc: "Tap your crop or enter custom variety below",
+                cropRice: "Rice (धान)",
+                cropWheat: "Wheat (गेहूं)",
+                cropTomato: "Tomato (टमाटर)",
+                cropPotato: "Potato (आलू)",
+                manualToggle: "Type Crop & Variety Manually",
+                lblManualName: "Crop Name * (e.g. Chilli, Rice)",
+                lblManualSpecies: "Species / Scientific Name (Optional)",
+                lblManualVariety: "Variety / Type (e.g. Basmati, Guntur)",
+                step2Title: "2. Upload Photo",
+                step2Desc: "Upload leaf image or click to simulate photo capture",
+                uploadPlaceholder: "Take Photo or Select File",
+                btnAnalyze: "Analyze Now",
+                scanStatusTitle: "AI Scanning in progress...",
+                scanStatusDesc: "Analyzing leaf tissue & matching database...",
+                errCropName: "Please select a crop or type the crop name manually",
+                errPhoto: "Please upload or select a leaf photo first",
+                navHome: "Home",
+                navTimeline: "Timeline",
+                navWeather: "Weather",
+                navChatbot: "Mitra"
+            },
+            hi: {
+                backHeader: "होम पर जाएं",
+                headerTitle: "फसल स्कैन करें",
+                step1Title: "1. फसल का चयन करें",
+                step1Desc: "फसल पर टैप करें या नीचे अपनी किस्म दर्ज करें",
+                cropRice: "धान",
+                cropWheat: "गेहूं",
+                cropTomato: "टमाटर",
+                cropPotato: "आलू",
+                manualToggle: "फसल और किस्म खुद टाइप करें",
+                lblManualName: "फसल का नाम * (जैसे: मिर्च, धान)",
+                lblManualSpecies: "प्रजाति / वैज्ञानिक नाम (वैकल्पिक)",
+                lblManualVariety: "किस्म / प्रकार (जैसे: बासमती, पूसा)",
+                step2Title: "2. फोटो अपलोड करें",
+                step2Desc: "पत्ते की फोटो लें या गैलरी से चुनें",
+                uploadPlaceholder: "फोटो खींचे या फाइल चुनें",
+                btnAnalyze: "अभी जांचें",
+                scanStatusTitle: "एआई जांच जारी है...",
+                scanStatusDesc: "पत्ती की संरचना का विश्लेषण किया जा रहा है...",
+                errCropName: "कृपया फसल चुनें या मैन्युअल रूप से फसल का नाम दर्ज करें",
+                errPhoto: "कृपया पहले पत्ते की फोटो अपलोड करें",
+                navHome: "मुख्य",
+                navTimeline: "समयरेखा",
+                navWeather: "मौसम",
+                navChatbot: "मित्रा"
+            },
+            mr: {
+                backHeader: "मागे जा",
+                headerTitle: "पिकाचा स्कॅन",
+                step1Title: "१. पीक निवडा",
+                step1Desc: "पिकाच्या चिन्हावर टॅप करा किंवा माहिती खाली भरा",
+                cropRice: "भात",
+                cropWheat: "गहू",
+                cropTomato: "टोमॅटो",
+                cropPotato: "बटाटा",
+                manualToggle: "पीक व जातीचे नाव स्वतः लिहा",
+                lblManualName: "पिकाचे नाव * (उदा. मिरची, भात)",
+                lblManualSpecies: "प्रजाती / वैज्ञानिक नाव (पर्यायी)",
+                lblManualVariety: "जात / प्रकार (उदा. बासमती, आयआर६४)",
+                step2Title: "२. फोटो अपलोड करा",
+                step2Desc: "पानाचा फोटो घ्या किंवा गॅलरीतून निवडा",
+                uploadPlaceholder: "फोटो घ्या किंवा फाइल निवडा",
+                btnAnalyze: "आताच तपासा",
+                scanStatusTitle: "एआय तपासणी सुरू आहे...",
+                scanStatusDesc: "पानाचे रोग व कीटक तपासले जात आहेत...",
+                errCropName: "कृपया पीक निवडा किंवा पिकाचे नाव स्वतः प्रविष्ट करा",
+                errPhoto: "कृपया प्रथम पाण्याचा फोटो अपलोड करा",
+                navHome: "मुख्य पान",
+                navTimeline: "पीक चक्र",
+                navWeather: "हवामान",
+                navChatbot: "मित्रा"
+            }
+        };
+
+        const currentLang = localStorage.getItem('cropguard_lang') || 'en';
+        let selectedCropName = 'Rice';
+        let isManualMode = false;
+        let isPhotoSelected = false;
+
+        function applyTranslation() {
+            const langDict = dict[currentLang];
+            document.getElementById('txt-scan-header').textContent = langDict.backHeader;
+            document.getElementById('header-title').textContent = langDict.headerTitle;
+            document.getElementById('step1-title').textContent = langDict.step1Title;
+            document.getElementById('step1-desc').textContent = langDict.step1Desc;
+            document.getElementById('crop-rice').textContent = langDict.cropRice;
+            document.getElementById('crop-wheat').textContent = langDict.cropWheat;
+            document.getElementById('crop-tomato').textContent = langDict.cropTomato;
+            document.getElementById('crop-potato').textContent = langDict.cropPotato;
+            document.getElementById('manual-toggle-text').textContent = langDict.manualToggle;
+            
+            document.getElementById('lbl-manual-name').textContent = langDict.lblManualName;
+            document.getElementById('lbl-manual-species').textContent = langDict.lblManualSpecies;
+            document.getElementById('lbl-manual-variety').textContent = langDict.lblManualVariety;
+            
+            document.getElementById('step2-title').textContent = langDict.step2Title;
+            document.getElementById('step2-desc').textContent = langDict.step2Desc;
+            document.getElementById('camera-placeholder-text').textContent = langDict.uploadPlaceholder;
+            document.getElementById('btn-analyze').innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> ${langDict.btnAnalyze}`;
+            
+            document.getElementById('overlay-title').textContent = langDict.scanStatusTitle;
+            document.getElementById('overlay-desc').textContent = langDict.scanStatusDesc;
+
+            document.getElementById('nav-home').textContent = langDict.navHome;
+            document.getElementById('nav-timeline').textContent = langDict.navTimeline;
+            document.getElementById('nav-weather').textContent = langDict.navWeather;
+            document.getElementById('nav-chatbot').textContent = langDict.navChatbot;
+        }
+
+        function selectCrop(crop, element) {
+            isManualMode = false;
+            selectedCropName = crop;
+            
+            // Highlight predefined option
+            document.querySelectorAll('#predefined-crops-grid .visual-option').forEach(card => {
+                card.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            
+            // Close manual form
+            document.getElementById('manual-form').style.display = 'none';
+            document.getElementById('manual-chevron').className = 'fa-solid fa-chevron-down';
+        }
+
+        function toggleManualForm() {
+            const form = document.getElementById('manual-form');
+            const chevron = document.getElementById('manual-chevron');
+            
+            if (form.style.display === 'none') {
+                form.style.display = 'flex';
+                chevron.className = 'fa-solid fa-chevron-up';
+                isManualMode = true;
+                
+                // Deselect predefined grid
+                document.querySelectorAll('#predefined-crops-grid .visual-option').forEach(card => {
+                    card.classList.remove('selected');
+                });
+            } else {
+                form.style.display = 'none';
+                chevron.className = 'fa-solid fa-chevron-down';
+                isManualMode = false;
+                
+                // Default back to Rice
+                const riceOption = document.querySelector('#predefined-crops-grid .visual-option');
+                if (riceOption) {
+                    selectCrop('Rice', riceOption);
+                }
+            }
+        }
+
+        function triggerFileInput() {
+            // For testing convenience, if they tap, they can choose a file OR if they cancel, we pre-fill a simulated image
+            document.getElementById('file-input').click();
+        }
+
+        function previewImage(event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById('upload-preview');
+            const icon = document.getElementById('camera-placeholder-icon');
+            const text = document.getElementById('camera-placeholder-text');
+            const cameraBox = document.getElementById('camera-box');
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    icon.style.display = 'none';
+                    text.style.display = 'none';
+                    cameraBox.style.borderStyle = 'solid';
+                    isPhotoSelected = true;
+                    // Save mock image data to localStorage for result preview
+                    localStorage.setItem('cropguard_temp_image', e.target.result);
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function startScan() {
+            const errorDict = dict[currentLang];
+            
+            // Validation
+            let finalCropName = selectedCropName;
+            let finalSpecies = '';
+            let finalVariety = '';
+
+            if (isManualMode) {
+                const manualName = document.getElementById('manual-crop-name').value.trim();
+                const manualSpecies = document.getElementById('manual-crop-species').value.trim();
+                const manualVariety = document.getElementById('manual-crop-variety').value.trim();
+                
+                if (!manualName) {
+                    alert(errorDict.errCropName);
+                    return;
+                }
+                finalCropName = manualName;
+                finalSpecies = manualSpecies;
+                finalVariety = manualVariety;
+            }
+
+            // Simulate file if not uploaded (For easy prototyping/evaluation)
+            if (!isPhotoSelected) {
+                if (confirm(currentLang === 'en' ? "No photo uploaded. Connect mock photo to proceed?" : "कोई फोटो अपलोड नहीं है। डेमो फोटो का उपयोग करें?")) {
+                    // Set mock image indicator
+                    localStorage.setItem('cropguard_temp_image', 'MOCK');
+                    isPhotoSelected = true;
+                } else {
+                    alert(errorDict.errPhoto);
+                    return;
+                }
+            }
+
+            // Show Scanning animation
+            const overlay = document.getElementById('scan-overlay');
+            overlay.classList.add('active');
+
+            // Simulate AI matching process status texts
+            setTimeout(() => {
+                document.getElementById('overlay-desc').textContent = currentLang === 'en' ? "Leaf classification model loaded..." : "पत्ती वर्गीकरण मॉडल लोड किया गया...";
+            }, 500);
+
+            setTimeout(() => {
+                document.getElementById('overlay-desc').textContent = currentLang === 'en' ? "Detecting pathogen spots..." : "रोगजनकों के धब्बों का पता लगाया जा रहा है...";
+            }, 1000);
+
+            // Redirect to results with parameters after 1.8s
+            setTimeout(() => {
+                // Determine simulated diagnosis based on crop selection
+                let disease = 'Healthy';
+                let severity = 'Green';
+                
+                const cropLower = finalCropName.toLowerCase();
+                if (cropLower.includes('tomato')) {
+                    disease = 'Tomato Early Blight (टमाटर अगेती झुलसा)';
+                    severity = 'Red';
+                } else if (cropLower.includes('rice') || cropLower.includes('paddy') || cropLower.includes('धान') || cropLower.includes('भात')) {
+                    disease = 'Rice Leaf Blast (धान झोंका रोग)';
+                    severity = 'Yellow';
+                } else if (cropLower.includes('potato') || cropLower.includes('आलू') || cropLower.includes('बटाटा')) {
+                    disease = 'Potato Late Blight (आलू पछेती झुलसा)';
+                    severity = 'Red';
+                } else {
+                    // Generic dynamic disease for custom typed crops
+                    disease = `${finalCropName} Fungal Spot (कवक रोग)`;
+                    severity = 'Yellow';
+                }
+
+                // Save to last scan
+                localStorage.setItem('cropguard_last_scan_crop', `${finalCropName} ${finalVariety ? '(' + finalVariety + ')' : ''}`);
+                localStorage.setItem('cropguard_last_scan_status', disease);
+
+                // Build query params
+                const params = new URLSearchParams();
+                params.append('crop', finalCropName);
+                params.append('species', finalSpecies);
+                params.append('variety', finalVariety);
+                params.append('disease', disease);
+                params.append('severity', severity);
+
+                window.location.href = `result.html?${params.toString()}`;
+            }, 1800);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            applyTranslation();
+            
+            // Clean up temporary image container on load
+            localStorage.removeItem('cropguard_temp_image');
+        });
+    </script>
+</body>
+</html>

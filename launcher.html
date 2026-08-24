@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CropGuard AI - Mobile Access Portal</title>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2E7D32;
+            --primary-dark: #1B5E20;
+            --accent: #FBC02D;
+            --bg-light: #F4F8F4;
+            --text-main: #212121;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #e8f5e9;
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+            text-align: center;
+            border: 2px solid rgba(46, 125, 50, 0.1);
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .header i {
+            font-size: 2.8rem;
+            color: var(--primary);
+        }
+
+        h1 {
+            color: var(--primary-dark);
+            font-weight: 800;
+            margin: 0;
+            font-size: 2.2rem;
+        }
+
+        .qr-section {
+            background-color: var(--bg-light);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 25px 0;
+            display: inline-block;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.02);
+        }
+
+        .qr-placeholder {
+            width: 250px;
+            height: 250px;
+            background-color: #ddd;
+            margin: 0 auto;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: #666;
+        }
+
+        .ip-link {
+            display: inline-block;
+            margin-top: 15px;
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--primary);
+            text-decoration: none;
+            word-break: break-all;
+            padding: 8px 16px;
+            border-radius: 8px;
+            background-color: rgba(46, 125, 50, 0.08);
+            transition: all 0.2s ease;
+        }
+
+        .ip-link:hover {
+            background-color: rgba(46, 125, 50, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .steps-container {
+            text-align: left;
+            margin-top: 30px;
+        }
+
+        .step {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 18px;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .step-text {
+            font-size: 1.05rem;
+            line-height: 1.45;
+            color: #424242;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            background-color: var(--primary);
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            margin-top: 20px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(46,125,50,0.2);
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+            box-shadow: 0 6px 18px rgba(46,125,50,0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Logo -->
+        <div class="header">
+            <i class="fa-solid fa-circle-nodes"></i>
+            <h1>CropGuard AI</h1>
+        </div>
+
+        <p style="font-size: 1.1rem; color: #555; margin-bottom: 10px;">
+            Run the <strong>CropGuard AI App</strong> on your mobile phone locally!
+        </p>
+
+        <!-- QR Code Display Area -->
+        <div class="qr-section">
+            <div id="qr-code-container">
+                <div class="qr-placeholder" id="qr-load-placeholder">Generating QR Code...</div>
+            </div>
+            <a href="#" id="mobile-url-link" target="_blank" class="ip-link">http://127.0.0.1:8000/index.html</a>
+        </div>
+
+        <!-- Instructions -->
+        <div class="steps-container">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-text">Connect both your **Computer** and your **Mobile Phone** to the same Wi-Fi network.</div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-text">Open your mobile phone's **Camera app** and point it at the QR code above.</div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-text">Tap the pop-up link to open CropGuard on your phone, then click <strong>Install / Add to Home Screen</strong>!</div>
+            </div>
+        </div>
+
+        <!-- Desktop Quick Preview Button -->
+        <a href="./index.html" class="btn">
+            <i class="fa-solid fa-computer"></i> Run on Computer
+        </a>
+    </div>
+
+    <!-- Load Server Configuration generated by python server -->
+    <script src="server_details.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            // Read generated configuration
+            if (typeof APP_URL !== 'undefined') {
+                // Update text link
+                const link = document.getElementById('mobile-url-link');
+                link.href = APP_URL;
+                link.textContent = APP_URL;
+
+                // Load dynamic QR code from QRServer API
+                const qrContainer = document.getElementById('qr-code-container');
+                const encodedUrl = encodeURIComponent(APP_URL);
+                qrContainer.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodedUrl}" alt="CropGuard Mobile Scan QR" style="display: block; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 250px; height: 250px;">`;
+            } else {
+                document.getElementById('qr-load-placeholder').textContent = "Server Not Detected";
+            }
+        });
+    </script>
+</body>
+</html>

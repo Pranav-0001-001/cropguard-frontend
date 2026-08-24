@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CropGuard AI - Lifespan Tracker</title>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Style sheet -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="phone-simulator">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="app-logo" onclick="window.location.href='dashboard.html'" style="cursor: pointer;">
+                <i class="fa-solid fa-house"></i>
+                <span id="txt-home-header">Home</span>
+            </div>
+            <div style="font-weight: bold; color: var(--primary-dark);" id="header-title">Crop Lifespan</div>
+        </header>
+
+        <!-- Screen Content Scroll Area -->
+        <div class="screen-content">
+            
+            <!-- Crop Selector and Add Button Row -->
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <div class="form-group" style="flex: 1; gap: 4px;">
+                    <label id="lbl-select-crop" for="active-crop-select" style="font-size: 0.85rem;">Select Active Crop</label>
+                    <select id="active-crop-select" onchange="loadSelectedCropTimeline()" style="width: 100%; font-weight: bold; color: var(--primary-dark);">
+                        <!-- Filled dynamically -->
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="openAddCropModal()" style="padding: 0; width: 48px; height: 48px; min-height: 48px; margin-top: 20px; border-radius: var(--border-radius-md); display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(46,125,50,0.2);" title="Add New Crop">
+                    <i class="fa-solid fa-plus" style="font-size: 1.3rem;"></i>
+                </button>
+            </div>
+
+            <!-- Main Lifespan Progress Dashboard -->
+            <div class="progress-container">
+                <div class="card-title-row">
+                    <h2 id="display-crop-title" style="font-size: 1.25rem;">Rice (Basmati)</h2>
+                    <span id="current-stage-badge" class="badge badge-warning">Flowering Stage</span>
+                </div>
+                <p id="display-crop-variety" style="font-size: 0.8rem; color: var(--text-muted); margin-top: -6px;">Species: Oryza sativa | Variety: Basmati 370</p>
+                
+                <!-- Horizontal Progress Tracker -->
+                <div class="progress-bar-wrap">
+                    <div id="timeline-progress-bar" class="progress-bar-fill" style="width: 50%;"></div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
+                    <span id="days-elapsed-text" style="font-weight: 700; color: var(--primary-dark); font-size: 0.9rem;">Day 45 of 120 Days</span>
+                    <span id="percent-complete" style="font-weight: bold; color: var(--text-muted); font-size: 0.85rem;">37% Complete</span>
+                </div>
+
+                <!-- Connecting Node Timeline Graph -->
+                <div class="timeline-steps">
+                    <div class="timeline-step completed" onclick="viewStageDetails('seedling')">
+                        <div class="timeline-dot"></div>
+                        <span class="timeline-label" id="lbl-stage-seed">Seedling</span>
+                    </div>
+                    <div class="timeline-step completed" onclick="viewStageDetails('vegetative')">
+                        <div class="timeline-dot"></div>
+                        <span class="timeline-label" id="lbl-stage-veg">Vegetative</span>
+                    </div>
+                    <div class="timeline-step active" onclick="viewStageDetails('flowering')">
+                        <div class="timeline-dot"></div>
+                        <span class="timeline-label" id="lbl-stage-flower">Flowering</span>
+                    </div>
+                    <div class="timeline-step" onclick="viewStageDetails('harvest')">
+                        <div class="timeline-dot"></div>
+                        <span class="timeline-label" id="lbl-stage-harv">Harvest</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prediction Cards -->
+            <div class="card warning-accent" style="padding: 16px;">
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <i class="fa-solid fa-calendar-check" style="font-size: 1.5rem; color: var(--color-warning);"></i>
+                    <div>
+                        <h4 id="predict-title" style="font-weight: 700; color: var(--color-warning); font-size: 0.95rem;">Predicted Harvest Date</h4>
+                        <h3 id="predict-date" style="font-size: 1.15rem; font-weight: 800; color: var(--primary-dark); margin-top: 2px;">October 15, 2026</h3>
+                        <p id="predict-days-left" style="font-size: 0.78rem; color: var(--text-muted);">Approximately 75 days remaining</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic Care Tips Section based on selected/tapped stage -->
+            <div>
+                <h2 id="care-tips-header" style="margin-bottom: 4px;">Flowering Stage Care Tips</h2>
+                <p id="care-tips-subheader" style="font-size: 0.85rem;">Action items to maximize yields at this stage.</p>
+            </div>
+
+            <div id="care-tips-container" style="display: flex; flex-direction: column; gap: 12px;">
+                <!-- Filled dynamically by JavaScript -->
+            </div>
+
+        </div>
+
+        <!-- Add Custom Crop Modal Bottom Sheet -->
+        <div id="add-crop-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modal-title">Add Crop to Track</h2>
+                    <button class="close-modal" onclick="closeAddCropModal()">&times;</button>
+                </div>
+                
+                <div class="form-group">
+                    <label id="modal-lbl-name" for="input-crop-name">Crop Name *</label>
+                    <input type="text" id="input-crop-name" placeholder="e.g. Rice, Chilli, Wheat" required>
+                </div>
+
+                <div class="form-group">
+                    <label id="modal-lbl-species" for="input-crop-species">Species Name (Optional)</label>
+                    <input type="text" id="input-crop-species" placeholder="e.g. Oryza sativa">
+                </div>
+
+                <div class="form-group">
+                    <label id="modal-lbl-variety" for="input-crop-variety">Variety / Local Code</label>
+                    <input type="text" id="input-crop-variety" placeholder="e.g. Basmati, IR64, Sona">
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label id="modal-lbl-sowing" for="input-sowing-date">Sowing Date</label>
+                        <input type="date" id="input-sowing-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label id="modal-lbl-duration" for="input-duration">Duration (Days)</label>
+                        <input type="number" id="input-duration" value="120" min="30" max="360">
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="saveCustomCrop()" id="btn-save-crop" style="width: 100%; margin-top: 10px;">
+                    <i class="fa-solid fa-floppy-disk"></i> Add Crop
+                </button>
+            </div>
+        </div>
+
+        <!-- Persistent Bottom Navigation Bar -->
+        <nav class="bottom-nav">
+            <a href="dashboard.html" class="nav-item">
+                <i class="fa-solid fa-house"></i>
+                <span id="nav-home">Home</span>
+            </a>
+            <a href="lifespan.html" class="nav-item active">
+                <i class="fa-solid fa-calendar-day"></i>
+                <span id="nav-timeline">Timeline</span>
+            </a>
+            <a href="scan.html" class="nav-item nav-item-fab">
+                <i class="fa-solid fa-camera"></i>
+            </a>
+            <a href="weather.html" class="nav-item">
+                <i class="fa-solid fa-cloud-sun"></i>
+                <span id="nav-weather">Weather</span>
+            </a>
+            <a href="assistant.html" class="nav-item">
+                <i class="fa-solid fa-robot"></i>
+                <span id="nav-chatbot">Mitra</span>
+            </a>
+        </nav>
+    </div>
+
+    <script>
+        // Multi-language translation support
+        const dict = {
+            en: {
+                homeHeader: "Home",
+                headerTitle: "Crop Lifespan",
+                lblSelectCrop: "Select Active Crop",
+                lblStageSeed: "Seedling",
+                lblStageVeg: "Vegetative",
+                lblStageFlower: "Flowering",
+                lblStageHarv: "Harvest",
+                predictTitle: "Predicted Harvest Date",
+                predictDaysLeft: "days remaining",
+                careTipsHeader: "Care Tips",
+                careTipsSubheader: "Action items to maximize yields at this stage",
+                modalTitle: "Add Crop to Track",
+                modalName: "Crop Name *",
+                modalSpecies: "Species Name (Optional)",
+                modalVariety: "Variety / Code",
+                modalSowing: "Sowing Date",
+                modalDuration: "Duration (Days)",
+                btnSaveCrop: "Add Crop",
+                navHome: "Home",
+                navTimeline: "Timeline",
+                navWeather: "Weather",
+                navChatbot: "Mitra"
+            },
+            hi: {
+                homeHeader: "होम",
+                headerTitle: "फसल चक्र",
+                lblSelectCrop: "सक्रिय फसल चुनें",
+                lblStageSeed: "अंकुरण",
+                lblStageVeg: "वानस्पतिक",
+                lblStageFlower: "फूल आना",
+                lblStageHarv: "कटाई",
+                predictTitle: "अनुमानित कटाई तिथि",
+                predictDaysLeft: "दिन शेष हैं",
+                careTipsHeader: "देखभाल युक्तियाँ",
+                careTipsSubheader: "इस चरण में उपज बढ़ाने के लिए आवश्यक कार्य",
+                modalTitle: "फसल शामिल करें",
+                modalName: "फसल का नाम *",
+                modalSpecies: "प्रजाति का नाम (वैकल्पिक)",
+                modalVariety: "किस्म / कोड",
+                modalSowing: "बोने की तिथि",
+                modalDuration: "अवधि (दिन)",
+                btnSaveCrop: "फसल जोड़ें",
+                navHome: "मुख्य",
+                navTimeline: "समयरेखा",
+                navWeather: "मौसम",
+                navChatbot: "मित्रा"
+            },
+            mr: {
+                homeHeader: "होम",
+                headerTitle: "पीक चक्र",
+                lblSelectCrop: "सक्रिय पीक निवडा",
+                lblStageSeed: "अंकुरण",
+                lblStageVeg: "शाकीय वाढ",
+                lblStageFlower: "फुलोरा",
+                lblStageHarv: "कापणी",
+                predictTitle: "अंदाजे कापणी तारीख",
+                predictDaysLeft: "दिवस शिल्लक आहेत",
+                careTipsHeader: "देखभाल सल्ला",
+                careTipsSubheader: "या टप्प्यात उत्पादन वाढवण्यासाठी आवश्यक काळजी",
+                modalTitle: "नवीन पीक जोडा",
+                modalName: "पिकाचे नाव *",
+                modalSpecies: "प्रजातीचे नाव (पर्यायी)",
+                modalVariety: "जात / कोड",
+                modalSowing: "पेरणीची तारीख",
+                modalDuration: "कालावधी (दिवस)",
+                btnSaveCrop: "पीक जोडा",
+                navHome: "मुख्य पान",
+                navTimeline: "पीक चक्र",
+                navWeather: "हवामान",
+                navChatbot: "मित्रा"
+            }
+        };
+
+        const stageCareTips = {
+            seedling: [
+                { icon: "fa-droplet", text_en: "Maintain light soil moisture. Overwatering causes damping-off disease.", text_hi: "मिट्टी में हल्की नमी रखें। अधिक पानी देने से अंकुर सड़न रोग हो सकता है।", text_mr: "जमिनीत हलका ओलावा ठेवा. जास्त पाण्यामुळे रोपे कुजण्याचा रोग होतो." },
+                { icon: "fa-seedling", text_en: "Watch for early insect pests like aphids. Apply organic neem spray if spotted.", text_hi: "शुरुआती कीटों जैसे चेपा (एफिड्स) पर नजर रखें। दिखने पर जैविक नीम स्प्रे करें।", text_mr: "सुरुवातीच्या मावा किंवा तुडतुड्यांवर लक्ष ठेवा. आढळल्यास निंबोळी अर्काची फवारणी करावी." }
+            ],
+            vegetative: [
+                { icon: "fa-prescription-bottle", text_en: "Apply Nitrogen-rich fertilizer (Urea) to support heavy leaf & stem growth.", text_hi: "पत्तियों और तने की अच्छी वृद्धि के लिए नाइट्रोजन युक्त खाद (यूरिया) का प्रयोग करें।", text_mr: "पाने आणि खोडाच्या जोमदार वाढीसाठी नत्रयुक्त खत (युरिया) द्यावे." },
+                { icon: "fa-scissors", text_en: "Clear weeds around roots. Weeds compete for nutrients and host pathogens.", text_hi: "जड़ों के आसपास से खरपतवार हटाएं। खरपतवार पोषक तत्वों को छीनते हैं।", text_mr: "मुळांच्या जवळून तण काढून घ्यावे. तण पिकांचे अन्नद्रव्ये शोषून घेतात." }
+            ],
+            flowering: [
+                { icon: "fa-pot-food", text_en: "Apply Potassium-rich fertilizers to support bloom and enhance grain filling.", text_hi: "फूलों और दानों को मजबूत बनाने के लिए पोटैशियम युक्त उर्वरक का प्रयोग करें।", text_mr: "फुलोरा आणि दाणे भरण्यास मदत होण्यासाठी पालाशयुक्त (पोटॅश) खते द्यावीत." },
+                { icon: "fa-faucet-drip", text_en: "Keep water levels strictly consistent. Stress here leads to poor seed development.", text_hi: "पानी का स्तर एकसमान रखें। इस चरण में कमी से दानों का आकार छोटा रह जाता है।", text_mr: "पाणी देणे नियमित ठेवावे. या काळात पाण्याचा ताण पडल्यास उत्पादनात घट होते." }
+            ],
+            harvest: [
+                { icon: "fa-droplet-slash", text_en: "Stop irrigation completely 10-14 days before cutting crops to dry the grains.", text_hi: "दानों को सुखाने के लिए कटाई से 10-14 दिन पहले सिंचाई पूरी तरह बंद कर दें।", text_mr: "दाणे सुकवण्यासाठी कापणीपूर्वी १० ते १४ दिवस पाणी देणे पूर्णपणे बंद करावे." },
+                { icon: "fa-sickle", text_en: "Harvest when 85% of grain heads turn straw-colored. Avoid delays to reduce shatter loss.", text_hi: "जब 85% बालियां सुनहरी हो जाएं तो कटाई करें। देरी से दाने झड़ने का डर रहता है।", text_mr: "जेव्हा ८५% पिके पिवळी किंवा सोनेरी दिसतील तेव्हाच कापणी करावी. उशीर केल्यास नुकसान होते." }
+            ]
+        };
+
+        const currentLang = localStorage.getItem('cropguard_lang') || 'en';
+
+        // Pre-populate database helper
+        function initializeCrops() {
+            let crops = JSON.parse(localStorage.getItem('cropguard_crops'));
+            if (!crops || crops.length === 0) {
+                // Set default sowing dates relative to today
+                const dateRice = new Date();
+                dateRice.setDate(dateRice.getDate() - 45); // Sown 45 days ago
+                
+                const dateTomato = new Date();
+                dateTomato.setDate(dateTomato.getDate() - 20); // Sown 20 days ago
+
+                crops = [
+                    {
+                        name: "Rice",
+                        species: "Oryza sativa",
+                        variety: "Basmati 370",
+                        sowingDate: dateRice.toISOString().substring(0, 10),
+                        duration: 120
+                    },
+                    {
+                        name: "Tomato",
+                        species: "Solanum lycopersicum",
+                        variety: "Roma",
+                        sowingDate: dateTomato.toISOString().substring(0, 10),
+                        duration: 90
+                    }
+                ];
+                localStorage.setItem('cropguard_crops', JSON.stringify(crops));
+            }
+            return crops;
+        }
+
+        function populateCropSelector() {
+            const crops = initializeCrops();
+            const selector = document.getElementById('active-crop-select');
+            selector.innerHTML = '';
+            
+            crops.forEach((crop, idx) => {
+                const opt = document.createElement('option');
+                opt.value = idx;
+                opt.textContent = `${crop.name} (${crop.variety || 'Standard'})`;
+                selector.appendChild(opt);
+            });
+        }
+
+        function loadSelectedCropTimeline() {
+            const crops = JSON.parse(localStorage.getItem('cropguard_crops'));
+            const index = document.getElementById('active-crop-select').value;
+            if (!crops || !crops[index]) return;
+
+            const crop = crops[index];
+            document.getElementById('display-crop-title').textContent = `${crop.name} (${crop.variety || 'Custom'})`;
+            document.getElementById('display-crop-variety').textContent = `Species: ${crop.species || 'N/A'} | Variety: ${crop.variety || 'Standard'}`;
+
+            // Calculate days elapsed
+            const sowDate = new Date(crop.sowingDate);
+            const today = new Date();
+            const diffTime = today - sowDate;
+            let daysElapsed = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            if (daysElapsed < 0) daysElapsed = 0;
+
+            const duration = parseInt(crop.duration) || 120;
+            const percent = Math.min(Math.round((daysElapsed / duration) * 100), 100);
+
+            // Progress text and fill
+            document.getElementById('timeline-progress-bar').style.width = `${percent}%`;
+            document.getElementById('days-elapsed-text').textContent = `Day ${daysElapsed} of ${duration} Days`;
+            document.getElementById('percent-complete').textContent = `${percent}% Complete`;
+
+            // Calculate current stage dynamically based on percentage
+            let currentStage = 'seedling';
+            if (percent <= 20) {
+                currentStage = 'seedling';
+            } else if (percent <= 50) {
+                currentStage = 'vegetative';
+            } else if (percent <= 80) {
+                currentStage = 'flowering';
+            } else {
+                currentStage = 'harvest';
+            }
+
+            // Update UI timeline node states
+            updateTimelineNodes(currentStage);
+
+            // Update Prediction Date
+            const harvestDate = new Date(sowDate);
+            harvestDate.setDate(harvestDate.getDate() + duration);
+            
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            const formattedHarvest = harvestDate.toLocaleDateString(currentLang === 'en' ? 'en-US' : (currentLang === 'hi' ? 'hi-IN' : 'mr-IN'), options);
+            document.getElementById('predict-date').textContent = formattedHarvest;
+
+            const daysLeft = duration - daysElapsed;
+            if (daysLeft > 0) {
+                document.getElementById('predict-days-left').textContent = `${daysLeft} ${dict[currentLang].predictDaysLeft}`;
+            } else {
+                document.getElementById('predict-days-left').textContent = currentLang === 'en' ? "Ready for harvest!" : (currentLang === 'hi' ? "कटाई के लिए तैयार!" : "कापणीसाठी तयार!");
+            }
+
+            // Load care tips
+            viewStageDetails(currentStage);
+        }
+
+        function updateTimelineNodes(activeStage) {
+            const steps = document.querySelectorAll('.timeline-step');
+            const stages = ['seedling', 'vegetative', 'flowering', 'harvest'];
+            const activeIdx = stages.indexOf(activeStage);
+
+            steps.forEach((step, idx) => {
+                step.classList.remove('completed', 'active');
+                if (idx < activeIdx) {
+                    step.classList.add('completed');
+                } else if (idx === activeIdx) {
+                    step.classList.add('active');
+                }
+            });
+
+            // Set badge
+            const badge = document.getElementById('current-stage-badge');
+            const langDict = dict[currentLang];
+            
+            let badgeText = '';
+            if (activeStage === 'seedling') {
+                badgeText = langDict.lblStageSeed;
+                badge.className = 'badge badge-success';
+            } else if (activeStage === 'vegetative') {
+                badgeText = langDict.lblStageVeg;
+                badge.className = 'badge badge-success';
+            } else if (activeStage === 'flowering') {
+                badgeText = langDict.lblStageFlower;
+                badge.className = 'badge badge-warning';
+            } else {
+                badgeText = langDict.lblStageHarv;
+                badge.className = 'badge badge-danger';
+            }
+            badge.textContent = `${badgeText} Stage`;
+        }
+
+        function viewStageDetails(stage) {
+            // Toggles active state manually on node click so the farmer can check other stages
+            document.querySelectorAll('.timeline-step').forEach(step => {
+                step.classList.remove('active');
+                const label = step.querySelector('.timeline-label').textContent;
+                const activeLabel = dict[currentLang][`lblStage${stage.charAt(0).toUpperCase() + stage.slice(1, 5)}`] || '';
+                if (label === activeLabel) {
+                    step.classList.add('active');
+                }
+            });
+
+            // Update care tips title
+            const stageLabel = dict[currentLang][`lblStage${stage.charAt(0).toUpperCase() + stage.slice(1, 5)}`] || stage;
+            document.getElementById('care-tips-header').textContent = `${stageLabel} Stage Care Tips`;
+
+            // Populate tips
+            const container = document.getElementById('care-tips-container');
+            container.innerHTML = '';
+
+            const tips = stageCareTips[stage];
+            tips.forEach((tip, index) => {
+                const text = tip[`text_${currentLang}`];
+                const card = `
+                    <div class="card" style="border: 1px solid rgba(46, 125, 50, 0.1); padding: 14px;">
+                        <div style="display: flex; gap: 14px; align-items: center;">
+                            <div style="width: 36px; height: 36px; border-radius: 50%; background-color: var(--primary-light); color: var(--primary-dark); display: flex; justify-content: center; align-items: center; font-size: 1.1rem; flex-shrink:0;">
+                                <i class="fa-solid ${tip.icon}"></i>
+                            </div>
+                            <p style="font-size: 0.88rem; color: var(--text-main); font-weight: 500;">${text}</p>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += card;
+            });
+        }
+
+        // Modal triggers
+        function openAddCropModal() {
+            document.getElementById('add-crop-modal').classList.add('active');
+            
+            // Default sowing date to today
+            const today = new Date().toISOString().substring(0, 10);
+            document.getElementById('input-sowing-date').value = today;
+        }
+
+        function closeAddCropModal() {
+            document.getElementById('add-crop-modal').classList.remove('active');
+        }
+
+        function saveCustomCrop() {
+            const name = document.getElementById('input-crop-name').value.trim();
+            const species = document.getElementById('input-crop-species').value.trim();
+            const variety = document.getElementById('input-crop-variety').value.trim();
+            const sowingDate = document.getElementById('input-sowing-date').value;
+            const duration = document.getElementById('input-duration').value || 120;
+
+            if (!name || !sowingDate) {
+                alert(currentLang === 'en' ? "Please fill name and sowing date" : "कृपया नाम और बोने की तारीख भरें");
+                return;
+            }
+
+            const newCrop = { name, species, variety, sowingDate, duration };
+            
+            const crops = JSON.parse(localStorage.getItem('cropguard_crops')) || [];
+            crops.push(newCrop);
+            localStorage.setItem('cropguard_crops', JSON.stringify(crops));
+
+            // Reload UI
+            populateCropSelector();
+            
+            // Set selection to new crop (last index)
+            document.getElementById('active-crop-select').value = crops.length - 1;
+            loadSelectedCropTimeline();
+
+            // Close
+            closeAddCropModal();
+
+            // Clear inputs
+            document.getElementById('input-crop-name').value = '';
+            document.getElementById('input-crop-species').value = '';
+            document.getElementById('input-crop-variety').value = '';
+        }
+
+        function applyTranslation() {
+            const langDict = dict[currentLang];
+            document.getElementById('txt-home-header').textContent = langDict.homeHeader;
+            document.getElementById('header-title').textContent = langDict.headerTitle;
+            document.getElementById('lbl-select-crop').textContent = langDict.lblSelectCrop;
+            document.getElementById('lbl-stage-seed').textContent = langDict.lblStageSeed;
+            document.getElementById('lbl-stage-veg').textContent = langDict.lblStageVeg;
+            document.getElementById('lbl-stage-flower').textContent = langDict.lblStageFlower;
+            document.getElementById('lbl-stage-harv').textContent = langDict.lblStageHarv;
+            document.getElementById('predict-title').textContent = langDict.predictTitle;
+            document.getElementById('care-tips-subheader').textContent = langDict.careTipsSubheader;
+
+            // Modal text translation
+            document.getElementById('modal-title').textContent = langDict.modalTitle;
+            document.getElementById('modal-lbl-name').textContent = langDict.modalName;
+            document.getElementById('modal-lbl-species').textContent = langDict.modalSpecies;
+            document.getElementById('modal-lbl-variety').textContent = langDict.modalVariety;
+            document.getElementById('modal-lbl-sowing').textContent = langDict.modalSowing;
+            document.getElementById('modal-lbl-duration').textContent = langDict.modalDuration;
+            document.getElementById('btn-save-crop').innerHTML = `<i class="fa-solid fa-floppy-disk"></i> ${langDict.btnSaveCrop}`;
+
+            document.getElementById('nav-home').textContent = langDict.navHome;
+            document.getElementById('nav-timeline').textContent = langDict.navTimeline;
+            document.getElementById('nav-weather').textContent = langDict.navWeather;
+            document.getElementById('nav-chatbot').textContent = langDict.navChatbot;
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            applyTranslation();
+            populateCropSelector();
+            loadSelectedCropTimeline();
+        });
+    </script>
+</body>
+</html>

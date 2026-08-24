@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CropGuard AI - Dashboard</title>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Style sheet -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="phone-simulator">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="app-logo">
+                <i class="fa-solid fa-leaf"></i>
+                <span>CropGuard AI</span>
+            </div>
+            <div class="profile-trigger" id="profile-badge" onclick="logout()">
+                RK
+            </div>
+        </header>
+
+        <!-- Main Dashboard Screen Content -->
+        <div class="screen-content">
+            
+            <!-- Greeting & Farm Status -->
+            <div>
+                <h1 style="font-size: 1.6rem; font-weight: 800;">
+                    <span id="txt-greeting">Namaste</span>, <span id="farmer-display-name">Ramesh</span>! 👋
+                </h1>
+                <p id="txt-tagline" style="font-size: 0.9rem; margin-top: 4px;">Here is your farm status today.</p>
+            </div>
+
+            <!-- Health Status Indicator Banner -->
+            <div class="card primary-accent" style="position: relative; overflow: hidden;">
+                <div style="position: absolute; right: -20px; bottom: -20px; opacity: 0.15; font-size: 8rem;">
+                    <i class="fa-solid fa-square-check"></i>
+                </div>
+                <div class="card-title-row">
+                    <span class="badge badge-success" id="badge-status-title" style="font-size: 0.9rem; padding: 6px 14px;">Farm Status: Safe</span>
+                    <i class="fa-solid fa-circle-check" style="font-size: 1.8rem; color: var(--accent);"></i>
+                </div>
+                <h2 id="farm-status-desc" style="font-size: 1.4rem; font-weight: 700; margin-top: 8px;">No major threats detected</h2>
+                <p id="farm-status-sub" style="font-size: 0.9rem; opacity: 0.9;">Last scanned: 2 hours ago for Rice (Basmati)</p>
+            </div>
+
+            <!-- Core Feature Cards Grid -->
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+                
+                <!-- Primary Action: SCAN CROP (Pulsating border visual effect) -->
+                <div class="card" onclick="window.location.href='scan.html'" style="border: 2px solid var(--primary); background: linear-gradient(to right, #FFF, #F1F8E9); box-shadow: 0 4px 15px rgba(46, 125, 50, 0.15); animation: pulse-border 2s infinite;">
+                    <div style="display: flex; gap: 16px; align-items: center;">
+                        <div style="width: 56px; height: 56px; border-radius: var(--border-radius-md); background-color: var(--primary); display: flex; justify-content: center; align-items: center; color: white; font-size: 1.6rem;">
+                            <i class="fa-solid fa-camera-retro"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <h3 id="card-scan-title" style="color: var(--primary-dark); font-weight: 800;">📸 Scan My Crop</h3>
+                            <p id="card-scan-desc" style="font-size: 0.85rem;">Check for leaves disease instantly</p>
+                        </div>
+                        <i class="fa-solid fa-circle-play" style="font-size: 1.4rem; color: var(--primary);"></i>
+                    </div>
+                </div>
+
+                <!-- 2x2 Grid for other services -->
+                <div class="grid-2">
+                    
+                    <!-- Lifespan Tracker Widget -->
+                    <div class="card" onclick="window.location.href='lifespan.html'">
+                        <div class="card-icon"><i class="fa-solid fa-clock-rotate-left" style="color: #4CAF50;"></i></div>
+                        <h3 id="card-life-title" style="font-size: 1rem; font-weight: 700;">Crop Timeline</h3>
+                        <p id="card-life-desc" style="font-size: 0.75rem;">Day 45: Flowering Stage</p>
+                    </div>
+
+                    <!-- Weather alerts -->
+                    <div class="card" onclick="window.location.href='weather.html'">
+                        <div class="card-icon"><i class="fa-solid fa-cloud-sun-rain" style="color: var(--accent);"></i></div>
+                        <h3 id="card-weather-title" style="font-size: 1rem; font-weight: 700;">Weather Alerts</h3>
+                        <p id="card-weather-desc" style="font-size: 0.75rem;">88% humidity - High pest risk</p>
+                    </div>
+
+                    <!-- Pest Reporter -->
+                    <div class="card" onclick="window.location.href='pest.html'">
+                        <div class="card-icon"><i class="fa-solid fa-bug" style="color: var(--color-danger);"></i></div>
+                        <h3 id="card-pest-title" style="font-size: 1rem; font-weight: 700;">Report Pest</h3>
+                        <p id="card-pest-desc" style="font-size: 0.75rem;">Log insects to local block officer</p>
+                    </div>
+
+                    <!-- CropMitra Chatbot -->
+                    <div class="card" onclick="window.location.href='assistant.html'">
+                        <div class="card-icon"><i class="fa-solid fa-comments" style="color: #2196F3;"></i></div>
+                        <h3 id="card-mitra-title" style="font-size: 1rem; font-weight: 700;">CropMitra AI</h3>
+                        <p id="card-mitra-desc" style="font-size: 0.75rem;">Talk or ask questions visually</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Helpful Tip Card -->
+            <div class="card warning-accent">
+                <div style="display: flex; gap: 12px; align-items: flex-start;">
+                    <i class="fa-solid fa-lightbulb" style="font-size: 1.5rem; color: var(--color-warning); margin-top: 2px;"></i>
+                    <div>
+                        <h4 id="tip-title" style="font-weight: 700; color: var(--color-warning); font-size: 0.95rem; margin-bottom: 2px;">Today's Farm Tip</h4>
+                        <p id="tip-desc" style="font-size: 0.85rem; color: #5D4037;">Keep the water levels balanced in rice paddies during active flowering to boost yield.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Persistent Bottom Navigation Bar -->
+        <nav class="bottom-nav">
+            <a href="dashboard.html" class="nav-item active">
+                <i class="fa-solid fa-house"></i>
+                <span id="nav-home">Home</span>
+            </a>
+            <a href="lifespan.html" class="nav-item">
+                <i class="fa-solid fa-calendar-day"></i>
+                <span id="nav-timeline">Timeline</span>
+            </a>
+            <a href="scan.html" class="nav-item nav-item-fab">
+                <i class="fa-solid fa-camera"></i>
+            </a>
+            <a href="weather.html" class="nav-item">
+                <i class="fa-solid fa-cloud-sun"></i>
+                <span id="nav-weather">Weather</span>
+            </a>
+            <a href="assistant.html" class="nav-item">
+                <i class="fa-solid fa-robot"></i>
+                <span id="nav-chatbot">Mitra</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Pulsating border keyframe animation style sheet inject -->
+    <style>
+        @keyframes pulse-border {
+            0% { box-shadow: 0 4px 15px rgba(46, 125, 50, 0.15); border-color: rgba(46, 125, 50, 0.3); }
+            50% { box-shadow: 0 4px 22px rgba(46, 125, 50, 0.4); border-color: var(--primary); }
+            100% { box-shadow: 0 4px 15px rgba(46, 125, 50, 0.15); border-color: rgba(46, 125, 50, 0.3); }
+        }
+    </style>
+
+    <script>
+        // Multi-language translation support
+        const dict = {
+            en: {
+                greeting: "Namaste",
+                tagline: "Here is your farm status today",
+                statusBadge: "Farm Status: Safe",
+                statusDesc: "No major threats detected",
+                statusSub: "Last scanned: 2 hours ago for Rice (Basmati)",
+                scanTitle: "Scan My Crop",
+                scanDesc: "Check for leaf diseases instantly",
+                lifeTitle: "Crop Timeline",
+                lifeDesc: "Day 45: Flowering Stage",
+                weatherTitle: "Weather Alerts",
+                weatherDesc: "88% humidity - High pest risk",
+                pestTitle: "Report Pest",
+                pestDesc: "Log insects to local blocks",
+                mitraTitle: "CropMitra AI",
+                mitraDesc: "Ask crop questions visually",
+                tipTitle: "Today's Farm Tip",
+                tipDesc: "Keep the water levels balanced in rice paddies during active flowering to boost yield.",
+                navHome: "Home",
+                navTimeline: "Timeline",
+                navWeather: "Weather",
+                navChatbot: "Mitra"
+            },
+            hi: {
+                greeting: "नमस्ते",
+                tagline: "यह है आज आपके खेत की स्थिति",
+                statusBadge: "खेत की स्थिति: सुरक्षित",
+                statusDesc: "कोई बड़ा खतरा नहीं मिला",
+                statusSub: "आखिरी स्कैन: 2 घंटे पहले (धान - बासमती)",
+                scanTitle: "फसल स्कैन करें",
+                scanDesc: "पत्तियों के रोग की तुरंत जांच करें",
+                lifeTitle: "फसल चक्र",
+                lifeDesc: "दिन 45: फूल आने की अवस्था",
+                weatherTitle: "मौसम अलर्ट",
+                weatherDesc: "88% आर्द्रता - कीट का उच्च जोखिम",
+                pestTitle: "कीट रिपोर्ट करें",
+                pestDesc: "स्थानीय अधिकारियों को कीट की सूचना दें",
+                mitraTitle: "क्रॉपमित्रा एआई",
+                mitraDesc: "फसल के प्रश्न चित्रों से पूछें",
+                tipTitle: "आज की सलाह",
+                tipDesc: "धान की फसल में फूल आने की अवस्था में जल स्तर संतुलित रखें ताकि अधिक उपज मिल सके।",
+                navHome: "मुख्य",
+                navTimeline: "समयरेखा",
+                navWeather: "मौसम",
+                navChatbot: "मित्रा"
+            },
+            mr: {
+                greeting: "नमस्ते",
+                tagline: "आजची तुमच्या शेतीची परिस्थिती खालीलप्रमाणे आहे",
+                statusBadge: "शेतीची स्थिती: सुरक्षित",
+                statusDesc: "कोणताही धोका आढळला नाही",
+                statusSub: "शेवटचा स्कॅन: २ तासांपूर्वी (भात - बासमती)",
+                scanTitle: "पिकाचा स्कॅन",
+                scanDesc: "पानावरील रोगांची त्वरित तपासणी करा",
+                lifeTitle: "पीक चक्र",
+                lifeDesc: "दिवस ४५: फुलोरा अवस्था",
+                weatherTitle: "हवामान अलर्ट",
+                weatherDesc: "८८% आर्द्रता - रोगाचा मोठा धोका",
+                pestTitle: "कीटक नोंदवा",
+                pestDesc: "कृषी अधिकाऱ्यांकडे कीटकांची नोंद करा",
+                mitraTitle: "क्रॉपमित्रा एआय",
+                mitraDesc: "पिकांबद्दल प्रश्न विचारून मदत मिळवा",
+                tipTitle: "आजचा सल्ला",
+                tipDesc: "भाताच्या पिकामध्ये फुलोरा अवस्थेत पाण्याचे प्रमाण योग्य ठेवा जेणेकरून अधिक उत्पादन मिळेल.",
+                navHome: "मुख्य पान",
+                navTimeline: "पीक चक्र",
+                navWeather: "हवामान",
+                navChatbot: "मित्रा"
+            }
+        };
+
+        const currentLang = localStorage.getItem('cropguard_lang') || 'en';
+
+        function applyTranslation() {
+            const langDict = dict[currentLang];
+            document.getElementById('txt-greeting').textContent = langDict.greeting;
+            document.getElementById('txt-tagline').textContent = langDict.tagline;
+            document.getElementById('badge-status-title').textContent = langDict.statusBadge;
+            document.getElementById('farm-status-desc').textContent = langDict.statusDesc;
+            
+            // Handle last scan details dynamically based on local storage if available
+            const lastScanCrop = localStorage.getItem('cropguard_last_scan_crop') || 'Rice (Basmati)';
+            const lastScanStatus = localStorage.getItem('cropguard_last_scan_status') || 'Safe';
+            
+            if (lastScanStatus === 'Healthy' || lastScanStatus === 'Safe') {
+                document.getElementById('farm-status-desc').textContent = langDict.statusDesc;
+                document.getElementById('badge-status-title').className = "badge badge-success";
+                document.getElementById('badge-status-title').textContent = langDict.statusBadge;
+            } else if (lastScanStatus !== 'Safe') {
+                document.getElementById('farm-status-desc').textContent = `${lastScanCrop} - ${lastScanStatus}`;
+                document.getElementById('badge-status-title').className = "badge badge-danger";
+                document.getElementById('badge-status-title').textContent = currentLang === 'en' ? "Alert: Disease" : (currentLang === 'hi' ? "चेतावनी: रोग" : "चेतावणी: रोग");
+            }
+
+            document.getElementById('farm-status-sub').textContent = `${currentLang === 'en' ? 'Last scanned' : (currentLang === 'hi' ? 'आखिरी स्कैन' : 'शेवटचा स्कॅन')}: ${lastScanCrop}`;
+
+            document.getElementById('card-scan-title').textContent = `📸 ${langDict.scanTitle}`;
+            document.getElementById('card-scan-desc').textContent = langDict.scanDesc;
+            document.getElementById('card-life-title').textContent = langDict.lifeTitle;
+            document.getElementById('card-life-desc').textContent = langDict.lifeDesc;
+            document.getElementById('card-weather-title').textContent = langDict.weatherTitle;
+            document.getElementById('card-weather-desc').textContent = langDict.weatherDesc;
+            document.getElementById('card-pest-title').textContent = langDict.pestTitle;
+            document.getElementById('card-pest-desc').textContent = langDict.pestDesc;
+            document.getElementById('card-mitra-title').textContent = langDict.mitraTitle;
+            document.getElementById('card-mitra-desc').textContent = langDict.mitraDesc;
+            
+            document.getElementById('tip-title').textContent = langDict.tipTitle;
+            document.getElementById('tip-desc').textContent = langDict.tipDesc;
+
+            document.getElementById('nav-home').textContent = langDict.navHome;
+            document.getElementById('nav-timeline').textContent = langDict.navTimeline;
+            document.getElementById('nav-weather').textContent = langDict.navWeather;
+            document.getElementById('nav-chatbot').textContent = langDict.navChatbot;
+        }
+
+        function loadFarmerDetails() {
+            const farmerName = localStorage.getItem('cropguard_farmer_name') || 'Farmer Friend';
+            document.getElementById('farmer-display-name').textContent = farmerName;
+            
+            // Get initials
+            const initials = farmerName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+            document.getElementById('profile-badge').textContent = initials || 'K';
+        }
+
+        function logout() {
+            if (confirm(currentLang === 'en' ? 'Do you want to log out?' : (currentLang === 'hi' ? 'क्या आप लॉग आउट करना चाहते हैं?' : 'तुम्हाला लॉग आउट करायचे आहे का?'))) {
+                localStorage.removeItem('cropguard_is_logged');
+                window.location.href = 'index.html';
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadFarmerDetails();
+            applyTranslation();
+        });
+    </script>
+</body>
+</html>
